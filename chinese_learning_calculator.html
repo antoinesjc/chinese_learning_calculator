@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多久学成 — Mandarin Zest</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --orange:#f37a48;--orange-dark:#d95f2c;--orange-light:#f8dacd;
+    --green:#228b22;--green-dark:#1a6b1a;--green-light:#e0f4e0;
+    --white:#ffffff;--ink:#1c1c1c;--ink-mid:#555555;--ink-light:#999999;
+    --surface:#fdfcfa;--border:#ecddd5;--card:#ffffff;
+  }
+  body{font-family:'Outfit',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0}
+
+  /* TOPBAR */
+  .topbar{width:100%;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:16px 2rem}
+  .logo-text{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-0.01em}
+  .logo-text span{color:var(--orange)}
+
+  .app{width:100%;max-width:580px;padding:2.5rem 1.25rem 4rem}
+
+  /* HERO */
+  .hero{text-align:center;margin-bottom:2.5rem}
+  .hero-chars{font-family:'Noto Serif SC',serif;font-size:44px;font-weight:700;letter-spacing:0.1em;margin-bottom:1.25rem;line-height:1}
+  .hero-chars .c1{color:var(--orange)}
+  .hero-chars .c2{color:var(--green)}
+  .hero-chars .c3{color:var(--orange-light);-webkit-text-stroke:1.5px var(--orange)}
+  .hero-chars .c4{color:var(--green-light);-webkit-text-stroke:1.5px var(--green)}
+  .hero h1{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px;line-height:1.3}
+  .hero p{font-size:15px;color:var(--ink-mid)}
+
+  /* FORM */
+  .form-card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:1.75rem;margin-bottom:1rem;position:relative;overflow:hidden}
+  .form-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--green))}
+  .form-section-title{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:1rem}
+
+  .field{margin-bottom:1.25rem}
+  .field:last-child{margin-bottom:0}
+  .field label{display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px}
+  .field label span{font-weight:400;color:var(--ink-light);font-size:13px}
+
+  /* Pill selects */
+  .pill-group{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:400;color:var(--ink-mid);cursor:pointer;transition:all 0.15s;user-select:none;white-space:nowrap}
+  .pill:hover{border-color:var(--orange);color:var(--orange)}
+  .pill.selected{background:var(--orange-light);border-color:var(--orange);color:var(--orange);font-weight:500}
+  .pill.multi.selected{background:var(--green-light);border-color:var(--green);color:var(--green)}
+
+  /* Select dropdown */
+  .select-wrap{position:relative}
+  .select-wrap select{width:100%;appearance:none;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 40px 12px 14px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);cursor:pointer;transition:border-color 0.15s;outline:none}
+  .select-wrap select:focus{border-color:var(--orange)}
+  .select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--ink-light);pointer-events:none;font-size:14px}
+
+  /* Slider */
+  .slider-wrap{display:flex;align-items:center;gap:14px}
+  .slider-wrap input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:10px;background:var(--orange-light);outline:none;cursor:pointer}
+  .slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+  .slider-val{font-size:15px;font-weight:600;color:var(--orange);min-width:70px;text-align:right}
+
+  /* Language multi-select */
+  .lang-grid{display:flex;flex-wrap:wrap;gap:7px}
+
+  /* CTA */
+  .calc-btn{width:100%;background:var(--orange);color:white;border:none;border-radius:12px;padding:16px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.15s,transform 0.1s;margin-top:0.5rem}
+  .calc-btn:hover{background:var(--orange-dark);transform:translateY(-1px)}
+  .calc-btn:active{transform:none}
+
+  /* RESULT */
+  .result-screen{display:none}
+
+  .result-hero{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
+  .result-hero::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--orange),var(--green))}
+
+  .result-time-box{display:inline-flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,var(--orange-light),var(--green-light));border-radius:16px;padding:1.25rem 2rem;margin-bottom:1.25rem}
+  .result-time-main{font-size:48px;font-weight:700;color:var(--ink);letter-spacing:-0.03em;line-height:1}
+  .result-time-unit{font-size:14px;font-weight:500;color:var(--ink-mid);margin-top:4px}
+  .result-time-range{font-size:13px;color:var(--ink-light);margin-top:2px}
+
+  .result-heading{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px}
+  .result-sub{font-size:14px;color:var(--ink-mid);line-height:1.6;max-width:400px;margin:0 auto}
+
+  /* Scenario cards */
+  .scenarios{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+  .scenario-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1rem}
+  .scenario-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px}
+  .scenario-time{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;line-height:1;margin-bottom:2px}
+  .scenario-desc{font-size:12px;color:var(--ink-mid)}
+  .scenario-card.optimistic .scenario-time{color:var(--green)}
+  .scenario-card.realistic .scenario-time{color:var(--orange)}
+
+  /* Milestone timeline */
+  .timeline-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem}
+  .card-title{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:1rem}
+  .milestone{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;position:relative}
+  .milestone:last-child{margin-bottom:0}
+  .milestone-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+  .milestone-dot.done{background:var(--green-light);color:var(--green)}
+  .milestone-dot.next{background:var(--orange-light);color:var(--orange)}
+  .milestone-dot.far{background:var(--surface);color:var(--ink-light);border:1.5px solid var(--border)}
+  .milestone-body{}
+  .milestone-when{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+  .milestone-what{font-size:13px;color:var(--ink-mid);line-height:1.4}
+
+  /* Language boost card */
+  .boost-card{background:linear-gradient(135deg,var(--orange-light),var(--green-light));border-radius:16px;padding:1.25rem;margin-bottom:1rem}
+  .boost-title{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .boost-body{font-size:13px;color:var(--ink-mid);line-height:1.5}
+
+  /* Tip card */
+  .tip-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
+  .tip-title{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--ink)}
+  .tip-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .tip-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink-mid);line-height:1.5}
+  .tip-bullet{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:5px}
+
+  /* Comparison bar */
+  .comparison-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem}
+  .comp-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .comp-row:last-child{margin-bottom:0}
+  .comp-lang{font-size:12px;font-weight:500;color:var(--ink-mid);width:90px;flex-shrink:0}
+  .comp-track{flex:1;height:7px;background:var(--orange-light);border-radius:10px;overflow:hidden}
+  .comp-fill{height:100%;border-radius:10px;background:var(--orange);transition:width 0.8s ease}
+  .comp-fill.you{background:var(--green)}
+  .comp-time{font-size:12px;font-weight:500;color:var(--ink-mid);width:55px;text-align:right;flex-shrink:0}
+
+  /* Buttons */
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:0.25rem}
+  .restart-btn{background:var(--white);color:var(--ink);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s}
+  .restart-btn:hover{background:var(--orange-light)}
+  .share-btn{background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s}
+  .share-btn:hover{background:var(--green-dark)}
+
+  @keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .anim{animation:fadeSlide 0.35s ease forwards}
+
+  @media(max-width:420px){
+    .scenarios{grid-template-columns:1fr}
+    .result-time-main{font-size:40px}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo-text">Mandarin <span>Zest</span></div>
+</div>
+
+<div class="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-chars"><span class="c1">多</span><span class="c2">久</span><span class="c3">学</span><span class="c4">成</span></div>
+    <h1>多久学成 — How long to learn Chinese?</h1>
+    <p>A personalised estimate based on your background and goals</p>
+  </div>
+
+  <!-- FORM -->
+  <div id="formScreen">
+
+    <!-- Current level -->
+    <div class="form-card">
+      <div class="form-section-title">Your starting point</div>
+
+      <div class="field">
+        <label>What is your current Chinese level?</label>
+        <div class="pill-group" id="levelGroup">
+          <div class="pill selected" data-val="0" onclick="selectPill(this,'levelGroup')">Complete beginner</div>
+          <div class="pill" data-val="100" onclick="selectPill(this,'levelGroup')">HSK 1 — A few basics</div>
+          <div class="pill" data-val="300" onclick="selectPill(this,'levelGroup')">HSK 2 — Elementary</div>
+          <div class="pill" data-val="600" onclick="selectPill(this,'levelGroup')">HSK 3 — Intermediate</div>
+          <div class="pill" data-val="1000" onclick="selectPill(this,'levelGroup')">HSK 4 — Upper-intermediate</div>
+          <div class="pill" data-val="1500" onclick="selectPill(this,'levelGroup')">HSK 5 — Advanced</div>
+          <div class="pill" data-val="2000" onclick="selectPill(this,'levelGroup')">HSK 6 — Mastery</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>What is your mother tongue?</label>
+        <div class="select-wrap">
+          <select id="motherTongue">
+            <option value="1.0">English</option>
+            <option value="0.35">Cantonese</option>
+            <option value="0.4">Shanghainese / Hokkien / other Chinese dialect</option>
+            <option value="0.5">Japanese</option>
+            <option value="0.6">Korean</option>
+            <option value="0.8">Vietnamese</option>
+            <option value="0.82">Thai / Lao</option>
+            <option value="0.95">Arabic / Hebrew</option>
+            <option value="1.0">French / Spanish / Italian / Portuguese</option>
+            <option value="1.0">German / Dutch</option>
+            <option value="1.0">Russian / Polish / other Slavic</option>
+            <option value="1.05">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Do you speak any of these languages at intermediate level or above? <span>(select all that apply)</span></label>
+        <div class="lang-grid" id="extraLangs">
+          <div class="pill multi" data-boost="0.18" data-reason="Japanese shares thousands of kanji characters with Chinese — your reading ability transfers directly and massively" onclick="toggleLang(this)">🇯🇵 Japanese</div>
+          <div class="pill multi" data-boost="0.14" data-reason="Korean uses hanja (Chinese-origin characters) and shares significant vocabulary roots, giving you a strong head start in reading and vocabulary" onclick="toggleLang(this)">🇰🇷 Korean</div>
+          <div class="pill multi" data-boost="0.20" data-reason="Cantonese and Mandarin share the same written character system — you already know how to read. You mainly need to adjust pronunciation and some vocabulary" onclick="toggleLang(this)">🇭🇰 Cantonese</div>
+          <div class="pill multi" data-boost="0.15" data-reason="Hokkien/Taiwanese shares a large portion of Chinese vocabulary and characters, giving you a significant reading and comprehension advantage" onclick="toggleLang(this)">🇹🇼 Hokkien / Taiwanese</div>
+          <div class="pill multi" data-boost="0.12" data-reason="Other Chinese dialects (Shanghainese, Hakka, Teochew, etc.) share the written character system and much of the vocabulary" onclick="toggleLang(this)">🀄 Other Chinese dialect</div>
+          <div class="pill multi" data-boost="0.08" data-reason="Vietnamese is a tonal language with significant Chinese-origin vocabulary (Sino-Vietnamese). Tones and many words will feel familiar" onclick="toggleLang(this)">🇻🇳 Vietnamese</div>
+          <div class="pill multi" data-boost="0.05" data-reason="Thai is a tonal language — while the script and vocabulary differ, your ear is already trained for tonal distinctions, which is one of the hardest aspects for most learners" onclick="toggleLang(this)">🇹🇭 Thai</div>
+          <div class="pill multi" data-boost="0.04" data-reason="Lao is tonal and shares some vocabulary with Chinese via historical contact, giving you a small but real advantage with tones" onclick="toggleLang(this)">🇱🇦 Lao</div>
+          <div class="pill multi" data-boost="0.03" data-reason="Burmese is a tonal language, which helps with the tonal aspect of Mandarin — one of the biggest hurdles for non-tonal language speakers" onclick="toggleLang(this)">🇲🇲 Burmese</div>
+          <div class="pill multi" data-boost="0.0" data-reason="" onclick="toggleLang(this)">None of the above</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goal -->
+    <div class="form-card">
+      <div class="form-section-title">Your goal</div>
+
+      <div class="field">
+        <label>What level do you want to reach?</label>
+        <div class="pill-group" id="goalGroup">
+          <div class="pill" data-val="200" data-label="HSK 1 — Survival basics" onclick="selectPill(this,'goalGroup')">HSK 1 — Survival basics</div>
+          <div class="pill" data-val="400" data-label="HSK 2 — Basic travel &amp; daily life" onclick="selectPill(this,'goalGroup')">HSK 2 — Basic travel</div>
+          <div class="pill" data-val="800" data-label="HSK 3 — Everyday conversations" onclick="selectPill(this,'goalGroup')">HSK 3 — Everyday conversations</div>
+          <div class="pill selected" data-val="1300" data-label="HSK 4 — Comfortable fluency" onclick="selectPill(this,'goalGroup')">HSK 4 — Comfortable fluency</div>
+          <div class="pill" data-val="1900" data-label="HSK 5 — Professional proficiency" onclick="selectPill(this,'goalGroup')">HSK 5 — Professional level</div>
+          <div class="pill" data-val="2500" data-label="HSK 6 — Near-native mastery" onclick="selectPill(this,'goalGroup')">HSK 6 — Near-native mastery</div>
+          <div class="pill" data-val="3200" data-label="HSK 7–9 — Elite / academic level" onclick="selectPill(this,'goalGroup')">HSK 7–9 — Elite level</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Study habits -->
+    <div class="form-card">
+      <div class="form-section-title">Your study habits</div>
+
+      <div class="field">
+        <label>Hours per week you can dedicate <span id="hoursLabel">— 5 hrs/week</span></label>
+        <div class="slider-wrap">
+          <input type="range" id="hoursSlider" min="1" max="40" value="5" oninput="updateSlider()">
+          <div class="slider-val" id="sliderVal">5 hrs</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How will you mainly study?</label>
+        <div class="pill-group" id="methodGroup">
+          <div class="pill" data-val="1.3" onclick="selectPill(this,'methodGroup')">📱 Self-study / apps</div>
+          <div class="pill selected" data-val="1.0" onclick="selectPill(this,'methodGroup')">📚 Structured classes</div>
+          <div class="pill" data-val="0.75" onclick="selectPill(this,'methodGroup')">🌏 Living in China</div>
+          <div class="pill" data-val="0.85" onclick="selectPill(this,'methodGroup')">🗣️ Tutor + self-study</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How consistent are you? <span>(be honest!)</span></label>
+        <div class="pill-group" id="consistencyGroup">
+          <div class="pill" data-val="0.7" onclick="selectPill(this,'consistencyGroup')">😅 I tend to stop and restart</div>
+          <div class="pill selected" data-val="1.0" onclick="selectPill(this,'consistencyGroup')">🙂 Fairly consistent</div>
+          <div class="pill" data-val="1.25" onclick="selectPill(this,'consistencyGroup')">💪 Very disciplined</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="calculate()">Calculate my timeline →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-screen" id="resultScreen">
+
+    <div class="result-hero anim">
+      <div class="result-time-box">
+        <div class="result-time-main" id="rTimeMain">2.5</div>
+        <div class="result-time-unit" id="rTimeUnit">years</div>
+        <div class="result-time-range" id="rTimeRange">realistic estimate</div>
+      </div>
+      <h2 class="result-heading" id="rHeading"></h2>
+      <p class="result-sub" id="rSub"></p>
+    </div>
+
+    <div class="scenarios anim">
+      <div class="scenario-card optimistic">
+        <div class="scenario-label">🌟 Best case</div>
+        <div class="scenario-time" id="rOptimistic"></div>
+        <div class="scenario-desc">Everything clicks, you stay consistent</div>
+      </div>
+      <div class="scenario-card realistic">
+        <div class="scenario-label">📊 Realistic</div>
+        <div class="scenario-time" id="rRealistic"></div>
+        <div class="scenario-desc">Real life, holidays, busy weeks</div>
+      </div>
+    </div>
+
+    <div class="boost-card anim" id="boostCard">
+      <div class="boost-title" id="boostTitle"></div>
+      <div class="boost-body" id="boostBody"></div>
+    </div>
+
+    <div class="timeline-card anim">
+      <div class="card-title">Your milestone timeline</div>
+      <div id="milestones"></div>
+    </div>
+
+    <div class="tip-card anim">
+      <div class="tip-title">Tips to reach your goal faster</div>
+      <ul class="tip-list" id="tipList"></ul>
+    </div>
+
+    <div class="btn-row anim">
+      <button class="restart-btn" onclick="restart()">← Recalculate</button>
+      <button class="share-btn" onclick="shareResult()">Share result</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────
+let state = {
+  currentHours: 0,   // hours already banked (from current level)
+  goalHours: 1200,   // total hours needed for goal
+  motherFactor: 1.0, // multiplier from mother tongue
+  extraBoost: 0,     // reduction from additional languages
+  hrsPerWeek: 5,
+  methodFactor: 1.0,
+  consistencyFactor: 1.0,
+  goalLabel: 'Comfortable fluency (HSK 4–5)',
+};
+
+// ─── UI helpers ───────────────────────────────────────────────
+function selectPill(el, groupId) {
+  document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleLang(el) {
+  if (el.dataset.boost === '0.0') {
+    // "none" deselects all others
+    document.querySelectorAll('#extraLangs .pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+  } else {
+    document.querySelector('#extraLangs .pill[data-boost="0.0"]').classList.remove('selected');
+    el.classList.toggle('selected');
+  }
+}
+
+function updateSlider() {
+  const v = document.getElementById('hoursSlider').value;
+  document.getElementById('sliderVal').textContent = v + ' hrs';
+  document.getElementById('hoursLabel').textContent = `— ${v} hrs/week`;
+}
+
+// ─── Calculation ──────────────────────────────────────────────
+function calculate() {
+  // Read inputs
+  const currentEl = document.querySelector('#levelGroup .pill.selected');
+  const goalEl    = document.querySelector('#goalGroup .pill.selected');
+  const methodEl  = document.querySelector('#methodGroup .pill.selected');
+  const conEl     = document.querySelector('#consistencyGroup .pill.selected');
+
+  if (!currentEl || !goalEl || !methodEl || !conEl) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  const currentBanked = parseInt(currentEl.dataset.val);
+  const goalTotal     = parseInt(goalEl.dataset.val);
+  const goalLabel     = goalEl.dataset.label;
+  const motherFactor  = parseFloat(document.getElementById('motherTongue').value);
+  const methodFactor  = parseFloat(methodEl.dataset.val);
+  const conFactor     = parseFloat(conEl.dataset.val);
+  const hrsPerWeek    = parseInt(document.getElementById('hoursSlider').value);
+
+  // Extra language boost — sum, capped at 25%
+  let extraBoost = 0;
+  document.querySelectorAll('#extraLangs .pill.selected').forEach(p => {
+    extraBoost += parseFloat(p.dataset.boost);
+  });
+  extraBoost = Math.min(extraBoost, 0.25);
+
+  // Hours remaining = (goal - already banked) * all factors
+  const hoursNeeded = Math.max(0, (goalTotal - currentBanked) * motherFactor * (1 - extraBoost) * methodFactor);
+
+  // Realistic = divide by consistency factor
+  const realisticHours = hoursNeeded / conFactor;
+
+  // Weeks
+  const realisticWeeks = realisticHours / hrsPerWeek;
+  const optimisticWeeks = (hoursNeeded * 0.75) / hrsPerWeek;
+
+  // Build display
+  document.getElementById('formScreen').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.style.display = 'block';
+
+  // Main result
+  const rMonths = weeksToMonths(realisticWeeks);
+  const oMonths = weeksToMonths(optimisticWeeks);
+
+  document.getElementById('rTimeMain').textContent = formatTime(rMonths).value;
+  document.getElementById('rTimeUnit').textContent  = formatTime(rMonths).unit;
+  document.getElementById('rTimeRange').textContent = 'realistic estimate';
+
+  document.getElementById('rOptimistic').textContent = formatTime(oMonths).full;
+  document.getElementById('rRealistic').textContent  = formatTime(rMonths).full;
+
+  // Heading
+  const heading = getHeading(rMonths, hrsPerWeek);
+  document.getElementById('rHeading').textContent = heading.title;
+  document.getElementById('rSub').textContent = `To reach ${goalLabel} at ${hrsPerWeek} hour${hrsPerWeek===1?'':'s'} per week. ${heading.sub}`;
+
+  // Language boost card
+  buildBoostCard(motherFactor, extraBoost, currentEl.textContent);
+
+  // Milestones
+  buildMilestones(currentBanked, goalTotal, motherFactor, extraBoost, methodFactor, conFactor, hrsPerWeek);
+
+  // Tips
+  buildTips(hrsPerWeek, methodEl.textContent, conEl.dataset.val, motherFactor, extraBoost, currentBanked, goalTotal);
+
+  // Store for sharing
+  window._shareData = { rMonths, oMonths, goalLabel, hrsPerWeek };
+
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function weeksToMonths(weeks) { return weeks * 7 / 30.44; }
+
+function formatTime(months) {
+  if (months < 1) return { value: Math.round(months * 4), unit: 'weeks', full: Math.round(months * 4) + ' weeks' };
+  if (months < 24) {
+    const m = Math.round(months);
+    return { value: m, unit: m === 1 ? 'month' : 'months', full: m + ' month' + (m===1?'':'s') };
+  }
+  const y = (months / 12).toFixed(1).replace(/\.0$/, '');
+  return { value: y, unit: parseFloat(y) === 1 ? 'year' : 'years', full: y + ' year' + (parseFloat(y)===1?'':'s') };
+}
+
+function getHeading(months, hrs) {
+  if (months <= 4)  return { title: 'Quicker than you think!', sub: 'With focused effort this goal is very achievable.' };
+  if (months <= 12) return { title: 'A solid year of study.', sub: 'Consistent daily practice will get you there.' };
+  if (months <= 24) return { title: 'A meaningful commitment.', sub: 'Chinese rewards persistence — every month you\'ll feel the progress.' };
+  if (months <= 48) return { title: 'A long-term journey.', sub: 'The most rewarding goals take time. Many learners make it at this pace.' };
+  return { title: 'An ambitious goal — worth it.', sub: 'Near-native Chinese is rare and extraordinary. The journey itself is the reward.' };
+}
+
+function buildBoostCard(motherFactor, extraBoost, currentLevel) {
+  const title = document.getElementById('boostTitle');
+  const body  = document.getElementById('boostBody');
+  const card  = document.getElementById('boostCard');
+
+  const totalSaving = Math.round((1 - motherFactor) * 100 + extraBoost * 100);
+
+  // Collect selected language reasons
+  const selectedLangs = [];
+  document.querySelectorAll('#extraLangs .pill.selected').forEach(p => {
+    if (p.dataset.boost > 0 && p.dataset.reason) selectedLangs.push(p.dataset.reason);
+  });
+
+  if (totalSaving <= 2) {
+    card.style.background = 'var(--orange-light)';
+    title.innerHTML = '🎯 Starting from scratch';
+    body.textContent = 'As an English speaker with no related language background, you\'re working from the baseline. The good news: millions of people have done it. Structure and consistency beat shortcuts every time.';
+  } else {
+    card.style.background = 'linear-gradient(135deg, var(--green-light), var(--orange-light))';
+    title.innerHTML = `🚀 Your language background saves you ~${totalSaving}% of study time`;
+    const parts = [];
+    if (motherFactor < 0.9) {
+      const pct = Math.round((1 - motherFactor) * 100);
+      if (motherFactor <= 0.4) parts.push(`Your mother tongue gives you a massive head start — shared characters and similar grammar cut your learning curve by ~${pct}%`);
+      else if (motherFactor <= 0.65) parts.push(`Your mother tongue means character knowledge transfers directly to Chinese — a huge advantage in reading and vocabulary`);
+      else parts.push(`Your mother tongue shares tonal features or cultural familiarity with Chinese, giving you a meaningful head start`);
+    }
+    if (selectedLangs.length > 0) {
+      parts.push(...selectedLangs);
+    } else if (extraBoost > 0.02) {
+      const bPct = Math.round(extraBoost * 100);
+      parts.push(`Your additional language(s) contribute a further ~${bPct}% reduction in study time`);
+    }
+    body.innerHTML = parts.map((p, i) => `<div style="margin-bottom:${i < parts.length-1 ? '6px' : '0'}">${i > 0 ? '• ' : ''}${p}.</div>`).join('');
+  }
+}
+
+function buildMilestones(currentBanked, goalTotal, motherFactor, extraBoost, methodFactor, conFactor, hrsPerWeek) {
+  const el = document.getElementById('milestones');
+  el.innerHTML = '';
+
+  const allMilestones = [
+    { level: 1, hours: 200,  label: 'HSK 1 — Survival basics', what: 'Greetings, numbers, simple phrases — you can introduce yourself and order food' },
+    { level: 2, hours: 400,  label: 'HSK 2 — Elementary', what: 'Simple conversations about daily life, family, shopping and travel' },
+    { level: 3, hours: 800,  label: 'HSK 3 — Intermediate', what: 'Handle most everyday situations, read simple texts and menus' },
+    { level: 4, hours: 1300, label: 'HSK 4 — Upper-intermediate', what: 'Discuss a wide range of topics, watch Chinese TV with subtitles' },
+    { level: 5, hours: 1900, label: 'HSK 5 — Advanced', what: 'Read newspapers, hold professional conversations, express nuanced opinions' },
+    { level: 6, hours: 2500, label: 'HSK 6 — Mastery', what: 'Near-native fluency, literary texts, complex idioms and formal writing' },
+    { level: 7, hours: 3200, label: 'HSK 7–9 — Elite', what: 'Classical texts, academic discourse, translation-level command of the language' },
+  ];
+
+  // Determine current level number from the selected starting pill
+  const levelMap = { 0: 0, 100: 1, 300: 2, 600: 3, 1000: 4, 1500: 5, 2000: 6 };
+  const currentLevelNum = levelMap[currentBanked] ?? 0;
+
+  // Determine goal level number from the selected goal pill
+  const goalMap = { 200: 1, 400: 2, 800: 3, 1300: 4, 1900: 5, 2500: 6, 3200: 7 };
+  const goalLevelNum = goalMap[goalTotal] ?? 7;
+
+  // Only show milestones strictly above current level and up to and including goal level
+  const future = allMilestones.filter(m => m.level > currentLevelNum && m.level <= goalLevelNum);
+
+  if (future.length === 0) {
+    el.innerHTML = '<div style="font-size:14px;color:var(--ink-mid)">You\'re already at your goal level — pick a higher target to see your next milestones!</div>';
+    return;
+  }
+
+  future.forEach((m, i) => {
+    const hoursNeeded = Math.max(0, (m.hours - currentBanked) * motherFactor * (1 - extraBoost) * methodFactor / conFactor);
+    const weeksNeeded = hoursNeeded / hrsPerWeek;
+    const monthsNeeded = weeksToMonths(weeksNeeded);
+
+    const isNext = i === 0;
+    const dotClass = isNext ? 'next' : 'far';
+    const whenText = monthsNeeded < 1 ? 'In a few weeks' :
+                     monthsNeeded < 2 ? 'In about 1 month' :
+                     formatTime(monthsNeeded).full + ' from now';
+
+    el.innerHTML += `
+      <div class="milestone">
+        <div class="milestone-dot ${dotClass}">${isNext ? '→' : '◦'}</div>
+        <div class="milestone-body">
+          <div class="milestone-when">${whenText} — ${m.label}</div>
+          <div class="milestone-what">${m.what}</div>
+        </div>
+      </div>`;
+  });
+}
+
+function buildComparison(yourWeeks, hrsPerWeek) {
+  // FSI hours for an English speaker, at same hrs/week
+  const langs = [
+    { name: 'Spanish',   hours: 600 },
+    { name: 'French',    hours: 750 },
+    { name: 'German',    hours: 900 },
+    { name: 'Russian',   hours: 1100 },
+    { name: 'Arabic',    hours: 2200 },
+    { name: 'Chinese',   hours: yourWeeks * hrsPerWeek, isYou: true },
+  ];
+
+  const max = Math.max(...langs.map(l => l.hours));
+  const el = document.getElementById('compRows');
+  el.innerHTML = '';
+
+  langs.forEach(l => {
+    const weeks = l.hours / hrsPerWeek;
+    const months = weeksToMonths(weeks);
+    const pct = Math.round((l.hours / max) * 100);
+    el.innerHTML += `
+      <div class="comp-row">
+        <div class="comp-lang">${l.isYou ? '🇨🇳 <strong>Your goal</strong>' : l.name}</div>
+        <div class="comp-track"><div class="comp-fill${l.isYou ? ' you' : ''}" style="width:${pct}%"></div></div>
+        <div class="comp-time">${formatTime(months).full}</div>
+      </div>`;
+  });
+}
+
+function buildTips(hrs, method, consistency, motherFactor, extraBoost, currentBanked, goalTotal) {
+  const tips = [];
+
+  // ── Consistency & hours ──────────────────────────────────────
+  if (hrs < 5) tips.push('Even adding 30 minutes a day would cut your timeline significantly — consistency beats intensity every time.');
+  if (hrs >= 15) tips.push('With this many study hours, vary your methods: mix character drills, listening, speaking, and reading to avoid burnout and reinforce each skill.');
+  if (consistency === '0.7') tips.push('Set a non-negotiable daily minimum — even 10 minutes on bad days. Streaks matter far more than session length.');
+
+  // ── Method ───────────────────────────────────────────────────
+  if (method.includes('app') || method.includes('self')) {
+    tips.push('Self-study works best with a clear, structured syllabus. Mandarin Zest textbooks are designed exactly for self-learners — each unit builds on the last so you never hit a wall wondering what to study next.');
+  }
+
+  // ── Background ───────────────────────────────────────────────
+  if (motherFactor >= 1.0 && extraBoost < 0.05) {
+    tips.push('Characters are the biggest hurdle for learners without an Asian language background. Mandarin Zest\'s Character Guides break down stroke order, radicals, and memory techniques level by level — tackling characters systematically from day one pays dividends throughout your entire journey.');
+  }
+  if (extraBoost >= 0.1) {
+    tips.push('Leverage your existing character knowledge and start intensive reading practice early. Mandarin Zest Graded Readers are calibrated by HSK level so you can read native-style content from the very beginning without hitting a comprehension wall.');
+  }
+
+  // ── Beginner / HSK 1–2 ──────────────────────────────────────
+  if (currentBanked <= 300 && goalTotal >= 200) {
+    tips.push('At beginner level, having a structured textbook is essential — jumping between apps gives you vocabulary without grammar glue. Mandarin Zest\'s beginner textbooks guide you through pronunciation, tones, and core sentence patterns in a logical sequence.');
+    tips.push('Pair your textbook with a Mandarin Zest Workbook from day one — active writing practice cements what you read far better than passive review alone.');
+  }
+
+  // ── Intermediate / HSK 3–4 ──────────────────────────────────
+  if (currentBanked >= 300 && currentBanked <= 1000 && goalTotal >= 800) {
+    tips.push('Intermediate learners plateau because they stop getting comprehensible input. Mandarin Zest Graded Readers at HSK 3–4 level give you engaging native-style stories — enough challenge to grow, easy enough to actually enjoy reading.');
+    tips.push('At this stage, a structured workbook is the difference between passive recognition and active production. Mandarin Zest Workbooks at intermediate level focus heavily on grammar patterns and writing, exactly the skills that stall most learners here.');
+  }
+
+  // ── Advanced / HSK 5–6 ──────────────────────────────────────
+  if (currentBanked >= 1000 && goalTotal >= 1900) {
+    tips.push('Advanced learners often neglect formal character study, assuming they "know enough." Mandarin Zest\'s Character Guides at HSK 5–6 level cover complex characters, rare radicals, and classical components — the gap between fluent and truly literate.');
+    tips.push('At advanced level, extensive reading is the single most effective tool for closing the gap to native-level fluency. Mandarin Zest Graded Readers at HSK 5–6 expose you to the literary vocabulary and idiomatic structures that conversation practice alone will never cover.');
+  }
+
+  // ── Universal ────────────────────────────────────────────────
+  tips.push('Speaking from day one, even badly, accelerates every other skill. Find a language exchange partner or tutor — real conversations expose gaps that solo study never will.');
+  tips.push('Use spaced repetition (Anki, Pleco) for vocabulary — it is the single highest-ROI daily habit for Chinese learners at any level.');
+
+  const el = document.getElementById('tipList');
+  el.innerHTML = tips.slice(0, 6).map(t => `<li><div class="tip-bullet"></div>${t}</li>`).join('');
+}
+
+function shareResult() {
+  const d = window._shareData;
+  if (!d) return;
+  const text = `I'd need ${formatTime(d.rMonths).full} to reach ${d.goalLabel} in Chinese at ${d.hrsPerWeek} hrs/week — find out your timeline at MandarinZest.com 🇨🇳`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('.share-btn');
+      btn.textContent = 'Copied! ✓';
+      setTimeout(() => btn.textContent = 'Share result', 2000);
+    });
+  }
+}
+
+function restart() {
+  document.getElementById('resultScreen').style.display = 'none';
+  document.getElementById('formScreen').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
