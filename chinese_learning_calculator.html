@@ -9,7 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
 <style>
   /* Mandarin Zest "How long to learn Chinese?" calculator.
-     Works in a 100vh frame (it scrolls inside) or a tall fixed frame. */
+     Full-page embed (no inner scrolling): height:max(2200px, calc(4950px - 240vw)) with scrolling="no".
+     Also works in a 100vh frame (it then scrolls inside and shows a result bar on phones). */
   :root {
     --orange:#f37a48; --orange-d:#e2632f; --peach:#fdf1ea; --peach2:#f8dacd;
     --green:#1b6f1b; --green-d:#173f17; --mint:#e0f4e0;
@@ -563,8 +564,9 @@ function renderBottom(f, now, goal) {
 }
 
 // Phone: show a small result bar while the result card is off screen
+// (only when the frame is short and scrolls; in a tall full-page frame it stays hidden)
 if ("IntersectionObserver" in window) {
-  new IntersectionObserver(es => es.forEach(e => $("peek").classList.toggle("away", e.isIntersecting)), { threshold: 0.15 }).observe($("result"));
+  new IntersectionObserver(es => es.forEach(e => $("peek").classList.toggle("away", e.isIntersecting || innerHeight > 1200)), { threshold: 0.15 }).observe($("result"));
 }
 let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(update, 200); });
 $("peek").onclick = () => $("result").scrollIntoView({ behavior: "smooth", block: "start" });
