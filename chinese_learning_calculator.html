@@ -3,632 +3,643 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多久学成 — Mandarin Zest</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>How long to learn Chinese? · Mandarin Zest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --orange:#f37a48;--orange-dark:#d95f2c;--orange-light:#f8dacd;
-    --green:#228b22;--green-dark:#1a6b1a;--green-light:#e0f4e0;
-    --white:#ffffff;--ink:#1c1c1c;--ink-mid:#555555;--ink-light:#999999;
-    --surface:#fdfcfa;--border:#ecddd5;--card:#ffffff;
+  /* Mandarin Zest "How long to learn Chinese?" calculator.
+     Works in a 100vh frame (it scrolls inside) or a tall fixed frame. */
+  :root {
+    --orange:#f37a48; --orange-d:#e2632f; --peach:#fdf1ea; --peach2:#f8dacd;
+    --green:#1b6f1b; --green-d:#173f17; --mint:#e0f4e0;
+    --ink:#2a2420; --muted:#5c4f47; --cream:#fffaf6; --line:#ecdcd2; --soft:#d9e8d9;
   }
-  body{font-family:'Outfit',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0}
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { background:var(--cream); color:var(--ink); font-family:'Outfit','Noto Sans SC',system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  button, input, select { font-family:inherit; }
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible { outline:3px solid #4f7a94; outline-offset:2px; }
+  .app { max-width:1060px; margin:0 auto; padding:20px 18px 28px; display:flex; flex-direction:column; gap:18px; }
+  .eyebrow { font-size:12.5px; font-weight:800; letter-spacing:.12em; color:#a8431a; text-transform:uppercase; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border:0; border-radius:999px; background:var(--orange); color:var(--ink); font-weight:800; font-size:15px; padding:11px 20px; cursor:pointer; text-decoration:none; white-space:nowrap; transition:background .15s, transform .15s; }
+  .btn:hover { background:var(--orange-d); } .btn:active { transform:scale(.97); }
+  .btn.line { background:transparent; color:#fff; box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.35); }
+  .btn.line:hover { background:rgba(255,255,255,.08); }
+  .btn.green { background:var(--green); color:#fff; } .btn.green:hover { background:#145514; }
+  .btn:disabled { opacity:.5; cursor:default; }
 
-  /* TOPBAR */
-  .topbar{width:100%;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:16px 2rem}
-  .logo-text{font-size:20px;font-weight:600;color:var(--ink);letter-spacing:-0.01em}
-  .logo-text span{color:var(--orange)}
+  /* hero */
+  .hero { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:10px; background:var(--peach); border-radius:28px; padding:26px 28px 0; position:relative; }
+  .hero-txt { padding-bottom:24px; }
+  .hero h1 { margin:6px 0 8px; font-size:clamp(28px,4.2vw,42px); line-height:1.06; font-weight:800; letter-spacing:-.01em; }
+  .hero h1 em { font-style:normal; color:var(--orange-d); }
+  .hero p { margin:0; color:var(--muted); font-size:16px; line-height:1.45; max-width:520px; }
+  .mascot { width:170px; display:block; margin-bottom:-2px; }
 
-  .app{width:100%;max-width:580px;padding:2.5rem 1.25rem 4rem}
+  /* layout */
+  .main { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:24px; padding:20px; }
+  .switch { display:flex; background:var(--peach); border-radius:999px; padding:4px; gap:4px; margin-bottom:18px; }
+  .switch button { flex:1; border:0; background:transparent; border-radius:999px; padding:10px 8px; font-weight:800; font-size:14px; cursor:pointer; color:var(--muted); }
+  .switch button.on { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(42,36,32,.08); }
+  .q { display:flex; justify-content:space-between; align-items:baseline; gap:10px; font-size:15px; font-weight:800; margin:0 0 9px; }
+  .q small { font-weight:600; color:var(--muted); font-size:13px; }
+  .q b { color:var(--orange-d); }
+  .pills { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 18px; padding:0; border:0; }
+  .pill { border:1.5px solid var(--line); background:var(--cream); border-radius:999px; padding:7px 12px; font-size:13.5px; font-weight:600; color:var(--muted); cursor:pointer; transition:all .15s; }
+  .pill:hover { border-color:var(--orange); color:var(--ink); }
+  .pill.on { background:var(--orange); border-color:var(--orange); color:var(--ink); }
+  .pill.multi.on { background:var(--mint); border-color:#b9dfb9; color:var(--green); }
+  .select { width:100%; appearance:none; border:1.5px solid var(--line); border-radius:12px; padding:11px 36px 11px 12px; font-size:14.5px; background:var(--cream) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235c4f47' stroke-width='2' fill='none'/%3E%3C/svg%3E") no-repeat right 14px center; color:var(--ink); margin-bottom:10px; cursor:pointer; }
+  .select:focus { border-color:var(--orange); outline:none; }
+  .sub { font-size:13px; color:var(--muted); margin:0 0 8px; }
+  input[type=range] { -webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:6px; background:linear-gradient(90deg,var(--orange) var(--p,15%),var(--peach2) var(--p,15%)); margin:10px 0 22px; cursor:pointer; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:var(--orange); border:3px solid #fff; box-shadow:0 1px 5px rgba(0,0,0,.25); }
+  input[type=range]::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background:var(--orange); border:3px solid #fff; box-shadow:0 1px 5px rgba(0,0,0,.25); }
+  input[type=month] { width:100%; border:1.5px solid var(--orange); border-radius:12px; padding:10px 12px; font-size:15px; background:var(--cream); color:var(--ink); margin-bottom:10px; }
+  .hide { display:none !important; }
 
-  /* HERO */
-  .hero{text-align:center;margin-bottom:2.5rem}
-  .hero-chars{font-family:'Noto Serif SC',serif;font-size:44px;font-weight:700;letter-spacing:0.1em;margin-bottom:1.25rem;line-height:1}
-  .hero-chars .c1{color:var(--orange)}
-  .hero-chars .c2{color:var(--green)}
-  .hero-chars .c3{color:var(--orange-light);-webkit-text-stroke:1.5px var(--orange)}
-  .hero-chars .c4{color:var(--green-light);-webkit-text-stroke:1.5px var(--green)}
-  .hero h1{font-size:24px;font-weight:600;letter-spacing:-0.02em;margin-bottom:6px;line-height:1.3}
-  .hero p{font-size:15px;color:var(--ink-mid)}
+  /* result */
+  .result { background:var(--green-d); color:#fff; border-radius:24px; padding:24px; position:sticky; top:12px; overflow:hidden; }
+  .result .eyebrow { color:#ffb48f; }
+  .r-lead { font-size:15.5px; margin:10px 0 2px; color:var(--soft); }
+  .r-lead b { color:#fff; }
+  .r-big { font-size:clamp(36px,5vw,50px); font-weight:800; line-height:1; letter-spacing:-.02em; }
+  .r-big small { font-size:.45em; color:var(--soft); font-weight:700; letter-spacing:0; }
+  .r-meta { font-size:14.5px; color:var(--soft); margin-top:7px; }
+  .bar { position:relative; height:70px; margin:18px 4px 4px; }
+  .bar::before { content:""; position:absolute; left:0; right:0; top:22px; height:6px; border-radius:6px; background:linear-gradient(90deg,var(--orange),#ffb48f); }
+  .stop { position:absolute; top:11px; transform:translateX(-50%); text-align:center; }
+  .stop i { width:28px; height:28px; border-radius:50%; background:#fff; color:var(--green-d); font-style:normal; font-size:11.5px; font-weight:800; display:flex; align-items:center; justify-content:center; margin:0 auto; }
+  .stop.goal i { background:var(--orange); color:var(--ink); }
+  .stop span { display:block; font-size:11.5px; color:var(--soft); margin-top:6px; white-space:nowrap; }
+  .whatif { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:12px 14px; margin-top:10px; font-size:14px; color:var(--soft); line-height:1.45; }
+  .whatif b { color:#fff; } .whatif em { font-style:normal; color:#ffb48f; font-weight:800; }
+  .r-actions { display:flex; gap:8px; margin-top:16px; flex-wrap:wrap; }
+  .r-note { font-size:13px; color:#ffb48f; min-height:18px; margin-top:8px; }
 
-  /* FORM */
-  .form-card{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:1.75rem;margin-bottom:1rem;position:relative;overflow:hidden}
-  .form-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),var(--green))}
-  .form-section-title{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--orange);margin-bottom:1rem}
+  /* road + tips */
+  .two { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; }
+  h2 { margin:0 0 14px; font-size:19px; font-weight:800; }
+  .ms { display:grid; grid-template-columns:36px 1fr; gap:12px; margin-bottom:14px; }
+  .ms:last-child { margin-bottom:0; }
+  .ms i { width:34px; height:34px; border-radius:50%; background:var(--peach); color:#a8431a; font-style:normal; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .ms.next i { background:var(--orange); color:var(--ink); }
+  .ms.goal i { background:var(--mint); color:var(--green); }
+  .ms b { font-size:15px; } .ms b span { color:#a8431a; }
+  .ms p { margin:2px 0 0; font-size:14px; color:var(--muted); line-height:1.4; }
+  .tip { display:flex; gap:10px; margin-bottom:12px; font-size:14px; line-height:1.45; color:#4a3c34; }
+  .tip > span:first-child { flex:none; width:28px; height:28px; border-radius:8px; background:var(--peach); display:flex; align-items:center; justify-content:center; }
+  .tip b { color:var(--ink); }
+  .club { background:var(--mint); border-radius:16px; padding:12px 14px; margin-top:6px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .club span { font-size:14px; color:var(--green-d); line-height:1.35; }
+  .club .btn { font-size:14px; padding:9px 15px; }
 
-  .field{margin-bottom:1.25rem}
-  .field:last-child{margin-bottom:0}
-  .field label{display:block;font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px}
-  .field label span{font-weight:400;color:var(--ink-light);font-size:13px}
+  /* bottom */
+  .bottom { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:18px; }
+  .shop { background:var(--green-d); color:#fff; border-radius:26px; padding:24px; position:relative; overflow:hidden; }
+  .shop::before { content:"书"; position:absolute; right:-10px; bottom:-52px; font-family:'Noto Sans SC',sans-serif; font-size:190px; font-weight:700; color:rgba(255,255,255,.05); pointer-events:none; }
+  .shop > * { position:relative; }
+  .shop .eyebrow { color:#ffb48f; }
+  .shop h3 { margin:6px 0; font-size:23px; font-weight:800; }
+  .shop p { margin:0 0 14px; color:var(--soft); font-size:14.5px; line-height:1.45; max-width:420px; }
+  .kinds { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .kinds span { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:7px 10px; font-size:13px; font-weight:700; }
+  .shop-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13.5px; color:var(--soft); }
+  .code { border:1px dashed rgba(255,255,255,.4); background:rgba(255,255,255,.12); border-radius:8px; padding:2px 8px; color:#fff; font-weight:800; letter-spacing:.04em; }
+  .mail { background:var(--peach); border-radius:26px; padding:22px; display:flex; flex-direction:column; gap:10px; }
+  .mail h3 { margin:0; font-size:20px; font-weight:800; line-height:1.2; }
+  .mail p { margin:0; font-size:14.5px; color:var(--muted); line-height:1.45; }
+  .mailrow { display:flex; gap:8px; }
+  .mailrow input { flex:1; min-width:0; font-size:15px; padding:11px 14px; border:1.5px solid var(--peach2); border-radius:999px; background:#fff; }
+  .mailrow input:focus { outline:none; border-color:var(--orange); }
+  .consent { display:flex; gap:8px; align-items:flex-start; font-size:12.5px; line-height:1.4; color:#4a3c34; cursor:pointer; }
+  .consent input { width:17px; height:17px; margin:1px 0 0; flex:none; accent-color:var(--orange); }
+  .mailmsg { font-size:13.5px; min-height:18px; color:#a8431a; font-weight:600; }
+  .mailmsg.ok { color:var(--green); }
+  .foot { text-align:center; font-size:12.5px; color:var(--muted); line-height:1.5; }
 
-  /* Pill selects */
-  .pill-group{display:flex;flex-wrap:wrap;gap:8px}
-  .pill{display:flex;align-items:center;gap:6px;background:var(--surface);border:1.5px solid var(--border);border-radius:20px;padding:7px 14px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:400;color:var(--ink-mid);cursor:pointer;transition:all 0.15s;user-select:none;white-space:nowrap}
-  .pill:hover{border-color:var(--orange);color:var(--orange)}
-  .pill.selected{background:var(--orange-light);border-color:var(--orange);color:var(--orange);font-weight:500}
-  .pill.multi.selected{background:var(--green-light);border-color:var(--green);color:var(--green)}
-
-  /* Select dropdown */
-  .select-wrap{position:relative}
-  .select-wrap select{width:100%;appearance:none;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:12px 40px 12px 14px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--ink);cursor:pointer;transition:border-color 0.15s;outline:none}
-  .select-wrap select:focus{border-color:var(--orange)}
-  .select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--ink-light);pointer-events:none;font-size:14px}
-
-  /* Slider */
-  .slider-wrap{display:flex;align-items:center;gap:14px}
-  .slider-wrap input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:10px;background:var(--orange-light);outline:none;cursor:pointer}
-  .slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:var(--orange);cursor:pointer;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
-  .slider-val{font-size:15px;font-weight:600;color:var(--orange);min-width:70px;text-align:right}
-
-  /* Language multi-select */
-  .lang-grid{display:flex;flex-wrap:wrap;gap:7px}
-
-  /* CTA */
-  .calc-btn{width:100%;background:var(--orange);color:white;border:none;border-radius:12px;padding:16px;font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:background 0.15s,transform 0.1s;margin-top:0.5rem}
-  .calc-btn:hover{background:var(--orange-dark);transform:translateY(-1px)}
-  .calc-btn:active{transform:none}
-
-  /* RESULT */
-  .result-screen{display:none}
-
-  .result-hero{background:var(--white);border:1px solid var(--border);border-radius:20px;padding:2rem;text-align:center;margin-bottom:1rem;position:relative;overflow:hidden}
-  .result-hero::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--orange),var(--green))}
-
-  .result-time-box{display:inline-flex;flex-direction:column;align-items:center;background:linear-gradient(135deg,var(--orange-light),var(--green-light));border-radius:16px;padding:1.25rem 2rem;margin-bottom:1.25rem}
-  .result-time-main{font-size:48px;font-weight:700;color:var(--ink);letter-spacing:-0.03em;line-height:1}
-  .result-time-unit{font-size:14px;font-weight:500;color:var(--ink-mid);margin-top:4px}
-  .result-time-range{font-size:13px;color:var(--ink-light);margin-top:2px}
-
-  .result-heading{font-size:18px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px}
-  .result-sub{font-size:14px;color:var(--ink-mid);line-height:1.6;max-width:400px;margin:0 auto}
-
-  /* Scenario cards */
-  .scenarios{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
-  .scenario-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1rem}
-  .scenario-label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px}
-  .scenario-time{font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-0.02em;line-height:1;margin-bottom:2px}
-  .scenario-desc{font-size:12px;color:var(--ink-mid)}
-  .scenario-card.optimistic .scenario-time{color:var(--green)}
-  .scenario-card.realistic .scenario-time{color:var(--orange)}
-
-  /* Milestone timeline */
-  .timeline-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem}
-  .card-title{font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:1rem}
-  .milestone{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;position:relative}
-  .milestone:last-child{margin-bottom:0}
-  .milestone-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
-  .milestone-dot.done{background:var(--green-light);color:var(--green)}
-  .milestone-dot.next{background:var(--orange-light);color:var(--orange)}
-  .milestone-dot.far{background:var(--surface);color:var(--ink-light);border:1.5px solid var(--border)}
-  .milestone-body{}
-  .milestone-when{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
-  .milestone-what{font-size:13px;color:var(--ink-mid);line-height:1.4}
-
-  /* Language boost card */
-  .boost-card{background:linear-gradient(135deg,var(--orange-light),var(--green-light));border-radius:16px;padding:1.25rem;margin-bottom:1rem}
-  .boost-title{font-size:13px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:6px}
-  .boost-body{font-size:13px;color:var(--ink-mid);line-height:1.5}
-
-  /* Tip card */
-  .tip-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
-  .tip-title{font-size:13px;font-weight:600;margin-bottom:8px;color:var(--ink)}
-  .tip-list{list-style:none;display:flex;flex-direction:column;gap:7px}
-  .tip-list li{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--ink-mid);line-height:1.5}
-  .tip-bullet{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:5px}
-
-  /* Comparison bar */
-  .comparison-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem}
-  .comp-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .comp-row:last-child{margin-bottom:0}
-  .comp-lang{font-size:12px;font-weight:500;color:var(--ink-mid);width:90px;flex-shrink:0}
-  .comp-track{flex:1;height:7px;background:var(--orange-light);border-radius:10px;overflow:hidden}
-  .comp-fill{height:100%;border-radius:10px;background:var(--orange);transition:width 0.8s ease}
-  .comp-fill.you{background:var(--green)}
-  .comp-time{font-size:12px;font-weight:500;color:var(--ink-mid);width:55px;text-align:right;flex-shrink:0}
-
-  /* Buttons */
-  .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:0.25rem}
-  .restart-btn{background:var(--white);color:var(--ink);border:1.5px solid var(--border);border-radius:12px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s}
-  .restart-btn:hover{background:var(--orange-light)}
-  .share-btn{background:var(--green);color:white;border:none;border-radius:12px;padding:14px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s}
-  .share-btn:hover{background:var(--green-dark)}
-
-  @keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-  .anim{animation:fadeSlide 0.35s ease forwards}
-
-  @media(max-width:420px){
-    .scenarios{grid-template-columns:1fr}
-    .result-time-main{font-size:40px}
+  /* phone: floating result bar */
+  .peek { display:none; }
+  @media (max-width:820px) {
+    .main, .two, .bottom { grid-template-columns:minmax(0,1fr); }
+    .result { position:relative; top:0; }
+    .peek { position:fixed; left:12px; right:12px; bottom:12px; z-index:5; display:flex; justify-content:space-between; align-items:center; gap:10px; background:var(--ink); color:#fff; border:0; border-radius:999px; padding:12px 18px; font-size:14px; font-weight:700; box-shadow:0 8px 24px rgba(0,0,0,.25); cursor:pointer; transition:transform .25s, opacity .25s; }
+    .peek span:last-child { color:#ffb48f; white-space:nowrap; }
+    .peek.away { transform:translateY(90px); opacity:0; pointer-events:none; }
+    .app { padding-bottom:80px; }
   }
+  @media (max-width:600px) {
+    .app { padding:12px 12px 80px; gap:14px; }
+    .hero { grid-template-columns:minmax(0,1fr); padding:18px; border-radius:22px; }
+    .hero-txt { padding:0 74px 0 0; }
+    .mascot { position:absolute; right:10px; top:10px; width:68px; }
+    .hero p { font-size:14.5px; }
+    .card, .result { padding:16px; border-radius:20px; }
+    .switch button { font-size:13px; }
+    .mailrow { flex-direction:column; }
+    .bar { margin-left:10px; margin-right:10px; }
+  }
+  @media (prefers-reduced-motion:reduce) { * { transition:none !important; } }
 </style>
 </head>
 <body>
-
-<div class="topbar">
-  <div class="logo-text">Mandarin <span>Zest</span></div>
-</div>
-
 <div class="app">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-chars"><span class="c1">多</span><span class="c2">久</span><span class="c3">学</span><span class="c4">成</span></div>
-    <h1>多久学成 — How long to learn Chinese?</h1>
-    <p>A personalised estimate based on your background and goals</p>
-  </div>
-
-  <!-- FORM -->
-  <div id="formScreen">
-
-    <!-- Current level -->
-    <div class="form-card">
-      <div class="form-section-title">Your starting point</div>
-
-      <div class="field">
-        <label>What is your current Chinese level?</label>
-        <div class="pill-group" id="levelGroup">
-          <div class="pill selected" data-val="0" onclick="selectPill(this,'levelGroup')">Complete beginner</div>
-          <div class="pill" data-val="100" onclick="selectPill(this,'levelGroup')">HSK 1 — A few basics</div>
-          <div class="pill" data-val="300" onclick="selectPill(this,'levelGroup')">HSK 2 — Elementary</div>
-          <div class="pill" data-val="600" onclick="selectPill(this,'levelGroup')">HSK 3 — Intermediate</div>
-          <div class="pill" data-val="1000" onclick="selectPill(this,'levelGroup')">HSK 4 — Upper-intermediate</div>
-          <div class="pill" data-val="1500" onclick="selectPill(this,'levelGroup')">HSK 5 — Advanced</div>
-          <div class="pill" data-val="2000" onclick="selectPill(this,'levelGroup')">HSK 6 — Mastery</div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>What is your mother tongue?</label>
-        <div class="select-wrap">
-          <select id="motherTongue">
-            <option value="1.0">English</option>
-            <option value="0.35">Cantonese</option>
-            <option value="0.4">Shanghainese / Hokkien / other Chinese dialect</option>
-            <option value="0.5">Japanese</option>
-            <option value="0.6">Korean</option>
-            <option value="0.8">Vietnamese</option>
-            <option value="0.82">Thai / Lao</option>
-            <option value="0.95">Arabic / Hebrew</option>
-            <option value="1.0">French / Spanish / Italian / Portuguese</option>
-            <option value="1.0">German / Dutch</option>
-            <option value="1.0">Russian / Polish / other Slavic</option>
-            <option value="1.05">Other</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Do you speak any of these languages at intermediate level or above? <span>(select all that apply)</span></label>
-        <div class="lang-grid" id="extraLangs">
-          <div class="pill multi" data-boost="0.18" data-reason="Japanese shares thousands of kanji characters with Chinese — your reading ability transfers directly and massively" onclick="toggleLang(this)">🇯🇵 Japanese</div>
-          <div class="pill multi" data-boost="0.14" data-reason="Korean uses hanja (Chinese-origin characters) and shares significant vocabulary roots, giving you a strong head start in reading and vocabulary" onclick="toggleLang(this)">🇰🇷 Korean</div>
-          <div class="pill multi" data-boost="0.20" data-reason="Cantonese and Mandarin share the same written character system — you already know how to read. You mainly need to adjust pronunciation and some vocabulary" onclick="toggleLang(this)">🇭🇰 Cantonese</div>
-          <div class="pill multi" data-boost="0.15" data-reason="Hokkien/Taiwanese shares a large portion of Chinese vocabulary and characters, giving you a significant reading and comprehension advantage" onclick="toggleLang(this)">🇹🇼 Hokkien / Taiwanese</div>
-          <div class="pill multi" data-boost="0.12" data-reason="Other Chinese dialects (Shanghainese, Hakka, Teochew, etc.) share the written character system and much of the vocabulary" onclick="toggleLang(this)">🀄 Other Chinese dialect</div>
-          <div class="pill multi" data-boost="0.08" data-reason="Vietnamese is a tonal language with significant Chinese-origin vocabulary (Sino-Vietnamese). Tones and many words will feel familiar" onclick="toggleLang(this)">🇻🇳 Vietnamese</div>
-          <div class="pill multi" data-boost="0.05" data-reason="Thai is a tonal language — while the script and vocabulary differ, your ear is already trained for tonal distinctions, which is one of the hardest aspects for most learners" onclick="toggleLang(this)">🇹🇭 Thai</div>
-          <div class="pill multi" data-boost="0.04" data-reason="Lao is tonal and shares some vocabulary with Chinese via historical contact, giving you a small but real advantage with tones" onclick="toggleLang(this)">🇱🇦 Lao</div>
-          <div class="pill multi" data-boost="0.03" data-reason="Burmese is a tonal language, which helps with the tonal aspect of Mandarin — one of the biggest hurdles for non-tonal language speakers" onclick="toggleLang(this)">🇲🇲 Burmese</div>
-          <div class="pill multi" data-boost="0.0" data-reason="" onclick="toggleLang(this)">None of the above</div>
-        </div>
-      </div>
+  <section class="hero">
+    <div class="hero-txt">
+      <div class="eyebrow">Free tool · 多久学成</div>
+      <h1>How long will it take <em>you</em> to learn Chinese?</h1>
+      <p>Seven quick answers, an honest estimate with real dates, and what to do next.</p>
     </div>
+    <img class="mascot" src="mascot-laptop.png" alt="" aria-hidden="true">
+  </section>
 
-    <!-- Goal -->
-    <div class="form-card">
-      <div class="form-section-title">Your goal</div>
-
-      <div class="field">
-        <label>What level do you want to reach?</label>
-        <div class="pill-group" id="goalGroup">
-          <div class="pill" data-val="200" data-label="HSK 1 — Survival basics" onclick="selectPill(this,'goalGroup')">HSK 1 — Survival basics</div>
-          <div class="pill" data-val="400" data-label="HSK 2 — Basic travel &amp; daily life" onclick="selectPill(this,'goalGroup')">HSK 2 — Basic travel</div>
-          <div class="pill" data-val="800" data-label="HSK 3 — Everyday conversations" onclick="selectPill(this,'goalGroup')">HSK 3 — Everyday conversations</div>
-          <div class="pill selected" data-val="1300" data-label="HSK 4 — Comfortable fluency" onclick="selectPill(this,'goalGroup')">HSK 4 — Comfortable fluency</div>
-          <div class="pill" data-val="1900" data-label="HSK 5 — Professional proficiency" onclick="selectPill(this,'goalGroup')">HSK 5 — Professional level</div>
-          <div class="pill" data-val="2500" data-label="HSK 6 — Near-native mastery" onclick="selectPill(this,'goalGroup')">HSK 6 — Near-native mastery</div>
-          <div class="pill" data-val="3200" data-label="HSK 7–9 — Elite / academic level" onclick="selectPill(this,'goalGroup')">HSK 7–9 — Elite level</div>
-        </div>
+  <section class="main">
+    <form class="card" id="form" onsubmit="return false" aria-label="Your answers">
+      <div class="switch" role="tablist" aria-label="What do you want to know?">
+        <button type="button" class="on" id="modeHow" role="tab" aria-selected="true">⏳ How long will it take?</button>
+        <button type="button" id="modeBy" role="tab" aria-selected="false">🎯 Reach it by a date</button>
       </div>
-    </div>
 
-    <!-- Study habits -->
-    <div class="form-card">
-      <div class="form-section-title">Your study habits</div>
-
-      <div class="field">
-        <label>Hours per week you can dedicate <span id="hoursLabel">— 5 hrs/week</span></label>
-        <div class="slider-wrap">
-          <input type="range" id="hoursSlider" min="1" max="40" value="5" oninput="updateSlider()">
-          <div class="slider-val" id="sliderVal">5 hrs</div>
+      <div id="byBox" class="hide">
+        <div class="q">I want to reach my goal by…</div>
+        <input type="month" id="byDate" aria-label="Target month">
+        <div class="pills" id="byChips">
+          <button type="button" class="pill" data-m="6">In 6 months</button>
+          <button type="button" class="pill" data-m="12">In 1 year</button>
+          <button type="button" class="pill" data-m="24">In 2 years</button>
+          <button type="button" class="pill" data-m="exam">My HSK exam date</button>
         </div>
       </div>
 
-      <div class="field">
-        <label>How will you mainly study?</label>
-        <div class="pill-group" id="methodGroup">
-          <div class="pill" data-val="1.3" onclick="selectPill(this,'methodGroup')">📱 Self-study / apps</div>
-          <div class="pill selected" data-val="1.0" onclick="selectPill(this,'methodGroup')">📚 Structured classes</div>
-          <div class="pill" data-val="0.75" onclick="selectPill(this,'methodGroup')">🌏 Living in China</div>
-          <div class="pill" data-val="0.85" onclick="selectPill(this,'methodGroup')">🗣️ Tutor + self-study</div>
-        </div>
+      <div class="q">1. Where are you now?</div>
+      <div class="pills" data-group="now" role="radiogroup">
+        <button type="button" class="pill on" data-v="0">Complete beginner</button>
+        <button type="button" class="pill" data-v="1">HSK 1</button>
+        <button type="button" class="pill" data-v="2">HSK 2</button>
+        <button type="button" class="pill" data-v="3">HSK 3</button>
+        <button type="button" class="pill" data-v="4">HSK 4</button>
+        <button type="button" class="pill" data-v="5">HSK 5</button>
+        <button type="button" class="pill" data-v="6">HSK 6</button>
+        <button type="button" class="pill" data-v="home">🏠 Grew up hearing it at home</button>
       </div>
 
-      <div class="field">
-        <label>How consistent are you? <span>(be honest!)</span></label>
-        <div class="pill-group" id="consistencyGroup">
-          <div class="pill" data-val="0.7" onclick="selectPill(this,'consistencyGroup')">😅 I tend to stop and restart</div>
-          <div class="pill selected" data-val="1.0" onclick="selectPill(this,'consistencyGroup')">🙂 Fairly consistent</div>
-          <div class="pill" data-val="1.25" onclick="selectPill(this,'consistencyGroup')">💪 Very disciplined</div>
-        </div>
+      <div class="q">2. Where do you want to get?</div>
+      <div class="pills" data-group="goal" role="radiogroup">
+        <button type="button" class="pill" data-v="1">HSK 1</button>
+        <button type="button" class="pill" data-v="2">HSK 2</button>
+        <button type="button" class="pill" data-v="3">HSK 3</button>
+        <button type="button" class="pill on" data-v="4">HSK 4 · fluent day to day</button>
+        <button type="button" class="pill" data-v="5">HSK 5</button>
+        <button type="button" class="pill" data-v="6">HSK 6</button>
+        <button type="button" class="pill" data-v="7">HSK 7–9</button>
       </div>
-    </div>
 
-    <button class="calc-btn" onclick="calculate()">Calculate my timeline →</button>
-  </div>
-
-  <!-- RESULT -->
-  <div class="result-screen" id="resultScreen">
-
-    <div class="result-hero anim">
-      <div class="result-time-box">
-        <div class="result-time-main" id="rTimeMain">2.5</div>
-        <div class="result-time-unit" id="rTimeUnit">years</div>
-        <div class="result-time-range" id="rTimeRange">realistic estimate</div>
+      <div class="q">3. What do you need?</div>
+      <div class="pills" data-group="need" role="radiogroup">
+        <button type="button" class="pill" data-v="speak">🗣️ Speaking &amp; listening only</button>
+        <button type="button" class="pill on" data-v="full">📖 Reading &amp; writing too</button>
       </div>
-      <h2 class="result-heading" id="rHeading"></h2>
-      <p class="result-sub" id="rSub"></p>
-    </div>
 
-    <div class="scenarios anim">
-      <div class="scenario-card optimistic">
-        <div class="scenario-label">🌟 Best case</div>
-        <div class="scenario-time" id="rOptimistic"></div>
-        <div class="scenario-desc">Everything clicks, you stay consistent</div>
+      <div class="q">4. Your languages</div>
+      <select class="select" id="tongue" aria-label="Mother tongue">
+        <option value="en">Mother tongue: English</option>
+        <option value="romance">Mother tongue: French / Spanish / Italian / Portuguese</option>
+        <option value="germanic">Mother tongue: German / Dutch / Nordic</option>
+        <option value="slavic">Mother tongue: Polish / Russian / other Slavic</option>
+        <option value="yue">Mother tongue: Cantonese</option>
+        <option value="dialect">Mother tongue: Hokkien / Taiwanese / Hakka / other Chinese</option>
+        <option value="ja">Mother tongue: Japanese</option>
+        <option value="ko">Mother tongue: Korean</option>
+        <option value="vi">Mother tongue: Vietnamese</option>
+        <option value="th">Mother tongue: Thai / Lao</option>
+        <option value="ar">Mother tongue: Arabic / Hebrew</option>
+        <option value="other">Mother tongue: other</option>
+      </select>
+      <p class="sub">Do you also speak any of these well?</p>
+      <div class="pills" data-group="extra" data-multi="1">
+        <button type="button" class="pill multi" data-v="ja">🇯🇵 Japanese</button>
+        <button type="button" class="pill multi" data-v="ko">🇰🇷 Korean</button>
+        <button type="button" class="pill multi" data-v="yue">🇭🇰 Cantonese</button>
+        <button type="button" class="pill multi" data-v="dialect">🇹🇼 Taiwanese / other Chinese</button>
+        <button type="button" class="pill multi" data-v="vi">🇻🇳 Vietnamese</button>
+        <button type="button" class="pill multi" data-v="th">🇹🇭 Thai / Lao</button>
+        <button type="button" class="pill multi on" data-v="none">None of these</button>
       </div>
-      <div class="scenario-card realistic">
-        <div class="scenario-label">📊 Realistic</div>
-        <div class="scenario-time" id="rRealistic"></div>
-        <div class="scenario-desc">Real life, holidays, busy weeks</div>
+
+      <div id="hoursBox">
+        <div class="q"><span>5. Hours per week</span><b id="hoursVal">7 h</b></div>
+        <input type="range" id="hours" min="1" max="40" value="7" aria-label="Hours per week">
       </div>
-    </div>
 
-    <div class="boost-card anim" id="boostCard">
-      <div class="boost-title" id="boostTitle"></div>
-      <div class="boost-body" id="boostBody"></div>
-    </div>
+      <div class="q"><span id="qMethod">6. How will you study?</span></div>
+      <div class="pills" data-group="method" role="radiogroup">
+        <button type="button" class="pill" data-v="apps">📱 Apps &amp; self-study</button>
+        <button type="button" class="pill on" data-v="classes">📚 Classes / textbook</button>
+        <button type="button" class="pill" data-v="tutor">🗣️ Tutor + self-study</button>
+        <button type="button" class="pill" data-v="live">🌏 Living in Taiwan / China</button>
+      </div>
 
-    <div class="timeline-card anim">
-      <div class="card-title">Your milestone timeline</div>
+      <div class="q"><span id="qCons">7. Be honest: how consistent are you?</span></div>
+      <div class="pills" data-group="cons" role="radiogroup" style="margin-bottom:0">
+        <button type="button" class="pill" data-v="0.75">😅 I stop and restart</button>
+        <button type="button" class="pill on" data-v="1">🙂 Fairly steady</button>
+        <button type="button" class="pill" data-v="1.2">💪 Every single day</button>
+      </div>
+    </form>
+
+    <section class="result" id="result" aria-live="polite">
+      <div class="eyebrow" id="rEyebrow">Your estimate</div>
+      <div class="r-lead" id="rLead"></div>
+      <div class="r-big" id="rBig"></div>
+      <div class="r-meta" id="rMeta"></div>
+      <div class="bar" id="rBar" aria-hidden="true"></div>
+      <div class="whatif" id="rWhatIf"></div>
+      <div class="r-actions">
+        <button class="btn" type="button" id="shareBtn">Share my timeline</button>
+        <button class="btn line" type="button" id="roadBtn">See my milestones ↓</button>
+      </div>
+      <div class="r-note" id="shareNote"></div>
+    </section>
+  </section>
+
+  <section class="two">
+    <div class="card" id="road">
+      <h2 id="roadTitle">Your road</h2>
       <div id="milestones"></div>
     </div>
-
-    <div class="tip-card anim">
-      <div class="tip-title">Tips to reach your goal faster</div>
-      <ul class="tip-list" id="tipList"></ul>
+    <div class="card">
+      <h2>How to get there faster</h2>
+      <div id="tips"></div>
+      <div class="club">
+        <span id="clubText"><b>Ready to speak?</b> Weekly small-group sessions in the Mandarin Zest Club.</span>
+        <a class="btn green" href="https://www.mandarinzest.com/mandarin-zest-club" target="_blank" rel="noopener">See the Club ↗</a>
+      </div>
     </div>
+  </section>
 
-    <div class="btn-row anim">
-      <button class="restart-btn" onclick="restart()">← Recalculate</button>
-      <button class="share-btn" onclick="shareResult()">Share result</button>
+  <section class="bottom">
+    <div class="shop">
+      <div class="eyebrow">Materials for your next step</div>
+      <h3 id="shopTitle">Start with HSK 1</h3>
+      <p>Textbooks, workbooks and graded readers made for self-learners, picked for your next milestone.</p>
+      <div class="kinds"><span>📘 Textbooks</span><span>✍️ Workbooks</span><span>📖 Graded readers</span></div>
+      <div class="shop-row">
+        <a class="btn" id="shopLink" href="https://www.mandarinzest.com/shop?tags=1" target="_blank" rel="noopener">Shop HSK 1 materials ↗</a>
+        <span>10% off with <span class="code">WELCOME01</span></span>
+      </div>
     </div>
-  </div>
+    <form class="mail" id="mailForm" novalidate>
+      <div class="eyebrow">Free, every week</div>
+      <h3 id="mailTitle">Stay on track</h3>
+      <p>Short weekly tips, study plans and new materials for your level. No spam.</p>
+      <div class="mailrow">
+        <input id="mailInput" type="email" placeholder="Your email" autocomplete="email" aria-label="Your email" maxlength="120">
+        <button class="btn" type="submit">Subscribe</button>
+      </div>
+      <label class="consent"><input type="checkbox" id="mailOk">I agree to receive emails from Mandarin Zest. I can unsubscribe at any time.</label>
+      <div class="mailmsg" id="mailMsg" aria-live="polite"></div>
+    </form>
+  </section>
 
+  <p class="foot">Estimates are based on typical study hours per HSK level and adjusted for your answers. Everyone learns differently, so treat it as a guide, not a promise.</p>
 </div>
 
+<button class="peek away" id="peek" type="button"><span id="peekText"></span><span>See result ↓</span></button>
+
+<canvas id="card" width="1080" height="1350" hidden></canvas>
+
 <script>
-// ─── State ───────────────────────────────────────────────────
-let state = {
-  currentHours: 0,   // hours already banked (from current level)
-  goalHours: 1200,   // total hours needed for goal
-  motherFactor: 1.0, // multiplier from mother tongue
-  extraBoost: 0,     // reduction from additional languages
-  hrsPerWeek: 5,
-  methodFactor: 1.0,
-  consistencyFactor: 1.0,
-  goalLabel: 'Comfortable fluency (HSK 4–5)',
+// ── Settings ──────────────────────────────────────────────────
+// Emails go to the same Google Sheet as "Start here", the HSK test and the stroke order tool.
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwPWbx4dg8r7HWMa_uMV-2ZH6Xis7VnzEWvUgVc8G3AUzY4lnrtaooCZGgsDrwHZ9VMYg/exec";
+const PAGE = "mandarinzest.com/chinese-learning-calculator";
+const SHOP_TAG = { 1: 1, 2: 6, 3: 2, 4: 3, 5: 4, 6: 5, 7: 5 };
+
+// Typical total study hours to reach each level (reading & writing included).
+const LEVELS = {
+  1: { name: "HSK 1",   hours: 200,  can: "Introduce yourself, order food, numbers and prices." },
+  2: { name: "HSK 2",   hours: 400,  can: "Simple chats about family, shopping and travel." },
+  3: { name: "HSK 3",   hours: 800,  can: "Handle most everyday situations, read menus and simple texts." },
+  4: { name: "HSK 4",   hours: 1300, can: "Talk about almost anything, watch shows with Chinese subtitles." },
+  5: { name: "HSK 5",   hours: 1900, can: "Read the news, hold professional conversations, give nuanced opinions." },
+  6: { name: "HSK 6",   hours: 2500, can: "Near-native fluency, literature, idioms and formal writing." },
+  7: { name: "HSK 7–9", hours: 3200, can: "Academic and professional mastery, translation-level Chinese." },
+};
+const SPEAK_CAN = {
+  1: "Greetings, ordering food, numbers and prices.",
+  2: "Simple chats about family, shopping and travel.",
+  3: "Get through most everyday situations out loud.",
+  4: "Talk about almost anything, follow shows with subtitles.",
+  5: "Work meetings, debates and nuanced opinions.",
+  6: "Near-native conversations, jokes and idioms.",
+  7: "Speak like an educated native on any topic.",
 };
 
-// ─── UI helpers ───────────────────────────────────────────────
-function selectPill(el, groupId) {
-  document.querySelectorAll(`#${groupId} .pill`).forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-}
+// How much your mother tongue changes the hours (1 = English baseline).
+const TONGUE = { en: 1, romance: 1, germanic: 1, slavic: 1, other: 1.05, ar: 0.97, th: 0.85, vi: 0.8, ko: 0.65, ja: 0.55, dialect: 0.45, yue: 0.4 };
+// Extra time saved by another language you speak well. `chars` = the saving comes from characters.
+const EXTRA = { ja: { save: 0.18, chars: true }, ko: { save: 0.12, chars: true }, yue: { save: 0.2 }, dialect: { save: 0.15 }, vi: { save: 0.08 }, th: { save: 0.05 } };
+const METHOD = { apps: 1.3, classes: 1, tutor: 0.85, live: 0.75 };
 
-function toggleLang(el) {
-  if (el.dataset.boost === '0.0') {
-    // "none" deselects all others
-    document.querySelectorAll('#extraLangs .pill').forEach(p => p.classList.remove('selected'));
-    el.classList.add('selected');
-  } else {
-    document.querySelector('#extraLangs .pill[data-boost="0.0"]').classList.remove('selected');
-    el.classList.toggle('selected');
-  }
-}
+const $ = id => document.getElementById(id);
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+let mode = "how", last = null;
 
-function updateSlider() {
-  const v = document.getElementById('hoursSlider').value;
-  document.getElementById('sliderVal').textContent = v + ' hrs';
-  document.getElementById('hoursLabel').textContent = `— ${v} hrs/week`;
-}
-
-// ─── Calculation ──────────────────────────────────────────────
-function calculate() {
-  // Read inputs
-  const currentEl = document.querySelector('#levelGroup .pill.selected');
-  const goalEl    = document.querySelector('#goalGroup .pill.selected');
-  const methodEl  = document.querySelector('#methodGroup .pill.selected');
-  const conEl     = document.querySelector('#consistencyGroup .pill.selected');
-
-  if (!currentEl || !goalEl || !methodEl || !conEl) {
-    alert('Please fill in all fields.');
-    return;
-  }
-
-  const currentBanked = parseInt(currentEl.dataset.val);
-  const goalTotal     = parseInt(goalEl.dataset.val);
-  const goalLabel     = goalEl.dataset.label;
-  const motherFactor  = parseFloat(document.getElementById('motherTongue').value);
-  const methodFactor  = parseFloat(methodEl.dataset.val);
-  const conFactor     = parseFloat(conEl.dataset.val);
-  const hrsPerWeek    = parseInt(document.getElementById('hoursSlider').value);
-
-  // Extra language boost — sum, capped at 25%
-  let extraBoost = 0;
-  document.querySelectorAll('#extraLangs .pill.selected').forEach(p => {
-    extraBoost += parseFloat(p.dataset.boost);
-  });
-  extraBoost = Math.min(extraBoost, 0.25);
-
-  // Hours remaining = (goal - already banked) * all factors
-  const hoursNeeded = Math.max(0, (goalTotal - currentBanked) * motherFactor * (1 - extraBoost) * methodFactor);
-
-  // Realistic = divide by consistency factor
-  const realisticHours = hoursNeeded / conFactor;
-
-  // Weeks
-  const realisticWeeks = realisticHours / hrsPerWeek;
-  const optimisticWeeks = (hoursNeeded * 0.75) / hrsPerWeek;
-
-  // Build display
-  document.getElementById('formScreen').style.display = 'none';
-  const rs = document.getElementById('resultScreen');
-  rs.style.display = 'block';
-
-  // Main result
-  const rMonths = weeksToMonths(realisticWeeks);
-  const oMonths = weeksToMonths(optimisticWeeks);
-
-  document.getElementById('rTimeMain').textContent = formatTime(rMonths).value;
-  document.getElementById('rTimeUnit').textContent  = formatTime(rMonths).unit;
-  document.getElementById('rTimeRange').textContent = 'realistic estimate';
-
-  document.getElementById('rOptimistic').textContent = formatTime(oMonths).full;
-  document.getElementById('rRealistic').textContent  = formatTime(rMonths).full;
-
-  // Heading
-  const heading = getHeading(rMonths, hrsPerWeek);
-  document.getElementById('rHeading').textContent = heading.title;
-  document.getElementById('rSub').textContent = `To reach ${goalLabel} at ${hrsPerWeek} hour${hrsPerWeek===1?'':'s'} per week. ${heading.sub}`;
-
-  // Language boost card
-  buildBoostCard(motherFactor, extraBoost, currentEl.textContent);
-
-  // Milestones
-  buildMilestones(currentBanked, goalTotal, motherFactor, extraBoost, methodFactor, conFactor, hrsPerWeek);
-
-  // Tips
-  buildTips(hrsPerWeek, methodEl.textContent, conEl.dataset.val, motherFactor, extraBoost, currentBanked, goalTotal);
-
-  // Store for sharing
-  window._shareData = { rMonths, oMonths, goalLabel, hrsPerWeek };
-
-  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function weeksToMonths(weeks) { return weeks * 7 / 30.44; }
-
-function formatTime(months) {
-  if (months < 1) return { value: Math.round(months * 4), unit: 'weeks', full: Math.round(months * 4) + ' weeks' };
-  if (months < 24) {
-    const m = Math.round(months);
-    return { value: m, unit: m === 1 ? 'month' : 'months', full: m + ' month' + (m===1?'':'s') };
-  }
-  const y = (months / 12).toFixed(1).replace(/\.0$/, '');
-  return { value: y, unit: parseFloat(y) === 1 ? 'year' : 'years', full: y + ' year' + (parseFloat(y)===1?'':'s') };
-}
-
-function getHeading(months, hrs) {
-  if (months <= 4)  return { title: 'Quicker than you think!', sub: 'With focused effort this goal is very achievable.' };
-  if (months <= 12) return { title: 'A solid year of study.', sub: 'Consistent daily practice will get you there.' };
-  if (months <= 24) return { title: 'A meaningful commitment.', sub: 'Chinese rewards persistence — every month you\'ll feel the progress.' };
-  if (months <= 48) return { title: 'A long-term journey.', sub: 'The most rewarding goals take time. Many learners make it at this pace.' };
-  return { title: 'An ambitious goal — worth it.', sub: 'Near-native Chinese is rare and extraordinary. The journey itself is the reward.' };
-}
-
-function buildBoostCard(motherFactor, extraBoost, currentLevel) {
-  const title = document.getElementById('boostTitle');
-  const body  = document.getElementById('boostBody');
-  const card  = document.getElementById('boostCard');
-
-  const totalSaving = Math.round((1 - motherFactor) * 100 + extraBoost * 100);
-
-  // Collect selected language reasons
-  const selectedLangs = [];
-  document.querySelectorAll('#extraLangs .pill.selected').forEach(p => {
-    if (p.dataset.boost > 0 && p.dataset.reason) selectedLangs.push(p.dataset.reason);
-  });
-
-  if (totalSaving <= 2) {
-    card.style.background = 'var(--orange-light)';
-    title.innerHTML = '🎯 Starting from scratch';
-    body.textContent = 'As an English speaker with no related language background, you\'re working from the baseline. The good news: millions of people have done it. Structure and consistency beat shortcuts every time.';
-  } else {
-    card.style.background = 'linear-gradient(135deg, var(--green-light), var(--orange-light))';
-    title.innerHTML = `🚀 Your language background saves you ~${totalSaving}% of study time`;
-    const parts = [];
-    if (motherFactor < 0.9) {
-      const pct = Math.round((1 - motherFactor) * 100);
-      if (motherFactor <= 0.4) parts.push(`Your mother tongue gives you a massive head start — shared characters and similar grammar cut your learning curve by ~${pct}%`);
-      else if (motherFactor <= 0.65) parts.push(`Your mother tongue means character knowledge transfers directly to Chinese — a huge advantage in reading and vocabulary`);
-      else parts.push(`Your mother tongue shares tonal features or cultural familiarity with Chinese, giving you a meaningful head start`);
+// ── Inputs ────────────────────────────────────────────────────
+function pick(group) { const b = document.querySelector(`[data-group="${group}"] .pill.on`); return b ? b.dataset.v : null; }
+document.querySelectorAll("[data-group]").forEach(g => {
+  g.addEventListener("click", e => {
+    const b = e.target.closest(".pill"); if (!b) return;
+    if (g.dataset.multi) {
+      if (b.dataset.v === "none") g.querySelectorAll(".pill").forEach(p => p.classList.toggle("on", p === b));
+      else { b.classList.toggle("on"); g.querySelector('[data-v="none"]').classList.toggle("on", !g.querySelector('.pill.on:not([data-v="none"])')); }
+    } else {
+      g.querySelectorAll(".pill").forEach(p => { p.classList.toggle("on", p === b); p.setAttribute("aria-checked", p === b); });
+      if (g.dataset.group === "now") keepGoalAbove();
+      if (g.dataset.group === "goal") keepNowBelow();
     }
-    if (selectedLangs.length > 0) {
-      parts.push(...selectedLangs);
-    } else if (extraBoost > 0.02) {
-      const bPct = Math.round(extraBoost * 100);
-      parts.push(`Your additional language(s) contribute a further ~${bPct}% reduction in study time`);
+    update();
+  });
+});
+function nowLevel() { const v = pick("now"); return v === "home" ? 0 : +v; }
+function keepGoalAbove() {
+  const n = nowLevel(), goal = +pick("goal");
+  if (goal <= n) setPill("goal", String(Math.min(7, n + 1)));
+}
+function keepNowBelow() {
+  const n = pick("now"), goal = +pick("goal");
+  if (n !== "home" && +n >= goal) setPill("now", String(goal - 1));
+}
+function setPill(group, v) { document.querySelectorAll(`[data-group="${group}"] .pill`).forEach(p => p.classList.toggle("on", p.dataset.v === v)); }
+
+function paintRange() { const r = $("hours"); r.style.setProperty("--p", ((r.value - r.min) / (r.max - r.min) * 100) + "%"); }
+$("hours").addEventListener("input", () => { $("hoursVal").textContent = $("hours").value + " h"; paintRange(); update(); });
+paintRange();
+$("tongue").addEventListener("change", update);
+
+function setMode(m) {
+  mode = m;
+  $("modeHow").classList.toggle("on", m === "how"); $("modeHow").setAttribute("aria-selected", m === "how");
+  $("modeBy").classList.toggle("on", m === "by"); $("modeBy").setAttribute("aria-selected", m === "by");
+  $("byBox").classList.toggle("hide", m !== "by");
+  $("hoursBox").classList.toggle("hide", m === "by");
+  $("qMethod").textContent = (m === "by" ? "5" : "6") + ". How will you study?";
+  $("qCons").textContent = (m === "by" ? "6" : "7") + ". Be honest: how consistent are you?";
+  if (m === "by" && !$("byDate").value) setTarget(12);
+  update();
+}
+$("modeHow").onclick = () => setMode("how");
+$("modeBy").onclick = () => setMode("by");
+function monthValue(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); }
+function setTarget(months) { const d = new Date(); d.setMonth(d.getMonth() + months); $("byDate").value = monthValue(d); }
+$("byChips").addEventListener("click", e => {
+  const b = e.target.closest(".pill"); if (!b) return;
+  $("byChips").querySelectorAll(".pill").forEach(p => p.classList.toggle("on", p === b));
+  if (b.dataset.m === "exam") { $("byDate").focus(); try { $("byDate").showPicker(); } catch (err) {} return; }
+  setTarget(+b.dataset.m); update();
+});
+$("byDate").addEventListener("input", () => { $("byChips").querySelectorAll(".pill").forEach(p => p.classList.remove("on")); update(); });
+(function () { const d = new Date(); d.setMonth(d.getMonth() + 1); $("byDate").min = monthValue(d); })();
+
+// ── The model ─────────────────────────────────────────────────
+function factors() {
+  const speak = pick("need") === "speak";
+  const home = pick("now") === "home";
+  const tongue = $("tongue").value;
+  let saving = 0;
+  document.querySelectorAll('[data-group="extra"] .pill.on').forEach(p => {
+    const x = EXTRA[p.dataset.v]; if (!x || p.dataset.v === tongue) return;
+    saving += x.chars && speak ? x.save / 2 : x.save;
+  });
+  saving = Math.min(saving, 0.25);
+  let bg = Math.max(0.3, TONGUE[tongue] * (1 - saving));
+  // Speaking only skips most of the character work.
+  const need = speak ? 0.55 : 1;
+  // Grew up hearing Chinese: speaking & listening are already partly there.
+  const heritage = home ? (speak ? 0.35 : 0.6) : 1;
+  return { speak, home, tongue, saving, bg, need, heritage, method: METHOD[pick("method")], cons: +pick("cons") };
+}
+function hoursTo(level, f, banked) {
+  return Math.max(0, (LEVELS[level].hours - banked) * f.bg * f.need * f.heritage * f.method);
+}
+function addWeeks(weeks) { const d = new Date(); d.setDate(d.getDate() + Math.round(weeks * 7)); return d; }
+function fmtDate(d) { return MONTHS[d.getMonth()] + " " + d.getFullYear(); }
+function shortDate(d) { return MONTHS[d.getMonth()] + " ’" + String(d.getFullYear()).slice(2); }
+function fmtSpan(weeks) {
+  const months = weeks * 7 / 30.44;
+  if (months < 1) return Math.max(1, Math.round(weeks)) + " weeks";
+  if (months < 24) { const m = Math.round(months); return m + (m === 1 ? " month" : " months"); }
+  return (months / 12).toFixed(1).replace(/\.0$/, "") + " years";
+}
+function levelName(l, f) { return f.speak ? LEVELS[l].name + " speaking" : LEVELS[l].name; }
+function weeksUntil(ym) { const [y, m] = ym.split("-").map(Number); const d = new Date(y, m - 1, 15); return (d - new Date()) / (7 * 864e5); }
+
+// ── Render ────────────────────────────────────────────────────
+function update() {
+  const f = factors(), now = nowLevel(), goal = +pick("goal");
+  const banked = now ? LEVELS[now].hours : 0;
+  const steps = [];
+  for (let l = now + 1; l <= goal; l++) steps.push(l);
+  const total = hoursTo(goal, f, banked);          // focused study hours
+  const realTotal = total / f.cons;                 // with real life in the way
+  const bestTotal = total * 0.8 / Math.max(1, f.cons);
+  const goalLabel = levelName(goal, f);
+
+  let hrs, weeks;
+  if (mode === "by") {
+    const w = $("byDate").value ? weeksUntil($("byDate").value) : 0;
+    weeks = Math.max(w, 0.5);
+    hrs = realTotal / weeks;
+    $("rEyebrow").textContent = innerWidth < 600 ? "Your plan" : "Your plan · updates as you change anything";
+    $("rLead").innerHTML = `To reach <b>${goalLabel}</b> by <b>${$("byDate").value ? fmtDate(new Date(+$("byDate").value.slice(0,4), +$("byDate").value.slice(5) - 1, 15)) : "…"}</b>, study about`;
+    const hShown = hrs < 1 ? "< 1" : String(Math.round(hrs));
+    $("rBig").innerHTML = `${hShown} h <small>a week</small>`;
+    const perDay = hrs / 7;
+    $("rMeta").textContent = `≈ ${perDay < 1 ? Math.max(5, Math.round(perDay * 60 / 5) * 5) + " minutes" : perDay.toFixed(1).replace(/\.0$/, "") + " hours"} a day · ${Math.round(realTotal).toLocaleString("en-US")} hours in ${fmtSpan(weeks)}`;
+    let msg;
+    if (w <= 0) msg = "<b>Pick a date in the future</b> to see your plan.";
+    else if (hrs > 25) msg = `<em>That's very intense.</em> Over 25 hours a week is close to full-time study. ${altText(f, realTotal, goal)}`;
+    else if (hrs > 14) msg = `<em>That's ambitious.</em> ${Math.round(hrs)} hours a week is a lot to keep up next to a job. ${altText(f, realTotal, goal)}`;
+    else if (hrs < 3) msg = `<b>Very doable.</b> Even short daily sessions will get you there. Add a weekly speaking session to make it stick.`;
+    else msg = `<b>A solid plan.</b> Spread it over the week: a little every day beats one long session.`;
+    $("rWhatIf").innerHTML = msg;
+    drawBar(steps, f, banked, hrs || 1, goal);
+    last = { goalLabel, when: $("byDate").value, hrs: Math.round(hrs), mode, steps, f, banked, goal, now };
+  } else {
+    hrs = +$("hours").value;
+    weeks = realTotal / hrs;
+    const date = addWeeks(weeks), best = addWeeks(bestTotal / hrs);
+    $("rEyebrow").textContent = innerWidth < 600 ? "Your estimate" : "Your estimate · updates as you change anything";
+    if (!steps.length) {
+      $("rLead").innerHTML = "You're already there!"; $("rBig").textContent = "🎉"; $("rMeta").textContent = "Pick a higher goal to see your next steps.";
+    } else {
+      $("rLead").innerHTML = `You'll reach <b>${goalLabel}</b> around`;
+      $("rBig").textContent = fmtDate(date);
+      $("rMeta").textContent = `≈ ${fmtSpan(weeks)} · ${Math.round(realTotal).toLocaleString("en-US")} study hours · best case ${fmtDate(best)}`;
     }
-    body.innerHTML = parts.map((p, i) => `<div style="margin-bottom:${i < parts.length-1 ? '6px' : '0'}">${i > 0 ? '• ' : ''}${p}.</div>`).join('');
+    if (hrs <= 37 && steps.length) {
+      const d2 = addWeeks(realTotal / (hrs + 3)), saved = Math.round((weeks - realTotal / (hrs + 3)) * 7 / 30.44);
+      $("rWhatIf").innerHTML = saved >= 1
+        ? `<b>What if?</b> Study <em>3 more hours a week</em> and you'd get there by <b>${fmtDate(d2)}</b>, ${saved} month${saved === 1 ? "" : "s"} sooner.`
+        : `<b>Nice pace.</b> Adding more hours won't change much now. Spend them speaking with real people instead.`;
+    } else $("rWhatIf").innerHTML = steps.length ? `<b>That's full-time study.</b> Make sure some of those hours are real conversations.` : "";
+    drawBar(steps, f, banked, hrs, goal);
+    last = { goalLabel, date, hrs, mode, steps, f, banked, goal, now, weeks };
   }
+  $("rWhatIf").style.display = $("rWhatIf").innerHTML ? "" : "none";
+  renderRoad(steps, f, banked, hrs || 1, goal);
+  renderTips(f, hrs || 1, now, goal);
+  renderBottom(f, now, goal);
+  $("peekText").textContent = mode === "by"
+    ? `${goalLabel} · ${last.hrs >= 1 ? last.hrs : "<1"} h a week`
+    : (steps.length ? `${goalLabel} · ${fmtDate(last.date)}` : "Already there!");
 }
-
-function buildMilestones(currentBanked, goalTotal, motherFactor, extraBoost, methodFactor, conFactor, hrsPerWeek) {
-  const el = document.getElementById('milestones');
-  el.innerHTML = '';
-
-  const allMilestones = [
-    { level: 1, hours: 200,  label: 'HSK 1 — Survival basics', what: 'Greetings, numbers, simple phrases — you can introduce yourself and order food' },
-    { level: 2, hours: 400,  label: 'HSK 2 — Elementary', what: 'Simple conversations about daily life, family, shopping and travel' },
-    { level: 3, hours: 800,  label: 'HSK 3 — Intermediate', what: 'Handle most everyday situations, read simple texts and menus' },
-    { level: 4, hours: 1300, label: 'HSK 4 — Upper-intermediate', what: 'Discuss a wide range of topics, watch Chinese TV with subtitles' },
-    { level: 5, hours: 1900, label: 'HSK 5 — Advanced', what: 'Read newspapers, hold professional conversations, express nuanced opinions' },
-    { level: 6, hours: 2500, label: 'HSK 6 — Mastery', what: 'Near-native fluency, literary texts, complex idioms and formal writing' },
-    { level: 7, hours: 3200, label: 'HSK 7–9 — Elite', what: 'Classical texts, academic discourse, translation-level command of the language' },
-  ];
-
-  // Determine current level number from the selected starting pill
-  const levelMap = { 0: 0, 100: 1, 300: 2, 600: 3, 1000: 4, 1500: 5, 2000: 6 };
-  const currentLevelNum = levelMap[currentBanked] ?? 0;
-
-  // Determine goal level number from the selected goal pill
-  const goalMap = { 200: 1, 400: 2, 800: 3, 1300: 4, 1900: 5, 2500: 6, 3200: 7 };
-  const goalLevelNum = goalMap[goalTotal] ?? 7;
-
-  // Only show milestones strictly above current level and up to and including goal level
-  const future = allMilestones.filter(m => m.level > currentLevelNum && m.level <= goalLevelNum);
-
-  if (future.length === 0) {
-    el.innerHTML = '<div style="font-size:14px;color:var(--ink-mid)">You\'re already at your goal level — pick a higher target to see your next milestones!</div>';
-    return;
+function altText(f, realTotal, goal) {
+  const at10 = fmtDate(addWeeks(realTotal / 10));
+  if (!f.speak) {
+    const speakHrs = realTotal * 0.55;
+    const w = $("byDate").value ? Math.max(1, weeksUntil($("byDate").value)) : 52;
+    return `Pick <b>speaking only</b> (≈ ${Math.round(speakHrs / w)} h a week) or give yourself until <b>${at10}</b> at 10 h a week.`;
   }
-
-  future.forEach((m, i) => {
-    const hoursNeeded = Math.max(0, (m.hours - currentBanked) * motherFactor * (1 - extraBoost) * methodFactor / conFactor);
-    const weeksNeeded = hoursNeeded / hrsPerWeek;
-    const monthsNeeded = weeksToMonths(weeksNeeded);
-
-    const isNext = i === 0;
-    const dotClass = isNext ? 'next' : 'far';
-    const whenText = monthsNeeded < 1 ? 'In a few weeks' :
-                     monthsNeeded < 2 ? 'In about 1 month' :
-                     formatTime(monthsNeeded).full + ' from now';
-
-    el.innerHTML += `
-      <div class="milestone">
-        <div class="milestone-dot ${dotClass}">${isNext ? '→' : '◦'}</div>
-        <div class="milestone-body">
-          <div class="milestone-when">${whenText} — ${m.label}</div>
-          <div class="milestone-what">${m.what}</div>
-        </div>
-      </div>`;
+  return `Give yourself until <b>${at10}</b> at 10 h a week, or aim for <b>${goal > 1 ? levelName(goal - 1, f) : "HSK 1"}</b> first.`;
+}
+function drawBar(steps, f, banked, hrs, goal) {
+  const bar = $("rBar"); bar.innerHTML = "";
+  if (!steps.length) { bar.style.display = "none"; return; }
+  bar.style.display = "";
+  const max = hoursTo(goal, f, banked) / f.cons / hrs;
+  const pts = [{ l: "•", w: 0, label: "Today" }].concat(steps.map(l => ({ l: l === 7 ? "7+" : String(l), w: hoursTo(l, f, banked) / f.cons / hrs, goal: l === goal })));
+  // keep labels from overlapping: drop middle stops that are too close
+  const gap = Math.max(13, 56 / Math.max(200, bar.getBoundingClientRect().width || 400) * 100);
+  let lastPct = -100;
+  pts.forEach((p, i) => {
+    const pct = 3 + 94 * (p.w / max);
+    const isEnd = i === 0 || i === pts.length - 1;
+    if (!isEnd && (pct - lastPct < gap || 97 - pct < gap)) return;
+    lastPct = pct;
+    const s = document.createElement("div");
+    s.className = "stop" + (p.goal ? " goal" : "");
+    s.style.left = pct + "%";
+    s.innerHTML = `<i>${p.l}</i><span>${i === 0 ? "Today" : shortDate(addWeeks(p.w))}</span>`;
+    bar.appendChild(s);
   });
 }
+function renderRoad(steps, f, banked, hrs, goal) {
+  $("roadTitle").textContent = steps.length ? "Your road to " + levelName(goal, f) : "Your road";
+  if (!steps.length) { $("milestones").innerHTML = `<p style="margin:0;color:var(--muted)">You're already at this level. Pick a higher goal to see your next milestones.</p>`; return; }
+  $("milestones").innerHTML = steps.map((l, i) => {
+    const w = hoursTo(l, f, banked) / f.cons / hrs;
+    const cls = i === 0 ? "next" : (l === goal ? "goal" : "");
+    const what = f.speak ? SPEAK_CAN[l] : LEVELS[l].can;
+    return `<div class="ms ${cls}"><i>${l === 7 ? "7+" : l}</i><div><b>${levelName(l, f)} <span>· ${fmtDate(addWeeks(w))}</span></b><p>${what}</p></div></div>`;
+  }).join("");
+}
+function renderTips(f, hrs, now, goal) {
+  const t = [];
+  if (f.home) t.push(["🏠", "Build on what you hear.", f.speak ? "Fill the gaps with tones and vocabulary beyond family topics." : "Your ear is ahead of your eyes: put most of your time into characters and reading."]);
+  if (!f.speak && TONGUE[f.tongue] >= 0.95 && f.saving < 0.1) t.push(["🧱", "Characters early.", "Learn how characters are built from day one, not just by repeating them."]);
+  if (f.speak) t.push(["🎧", "Listen a lot.", "Podcasts, shows and real conversations train your ear faster than any book."]);
+  if (pick("method") === "apps") t.push(["📖", "Follow one structured book.", "Apps alone give you words without the grammar glue."]);
+  if (now >= 3 && !f.speak) t.push(["📚", "Read every day.", "Graded readers at your level are the quickest way past the intermediate plateau."]);
+  if (f.cons < 1) t.push(["🔁", "Set a tiny daily minimum.", "Even 10 minutes on bad days keeps your streak alive."]);
+  else t.push(["🔁", "Review daily.", "Spaced repetition (Anki, Pleco) beats long weekend sessions."]);
+  if (hrs < 5 && mode === "how") t.push(["⏱️", "Find 30 more minutes a day.", "It adds up to 3.5 hours a week and cuts months off your timeline."]);
+  t.push(["🗣️", now >= 2 || f.home ? "Speak every week." : "Speak from HSK 2.", "Real conversations show gaps solo study never will."]);
+  $("tips").innerHTML = t.slice(0, 4).map(x => `<div class="tip"><span>${x[0]}</span><span><b>${x[1]}</b> ${x[2]}</span></div>`).join("");
+  $("clubText").innerHTML = f.speak
+    ? "<b>Speaking is your goal?</b> Practise every week in small groups in the Mandarin Zest Club."
+    : "<b>Ready to speak?</b> Weekly small-group sessions in the Mandarin Zest Club.";
+}
+function renderBottom(f, now, goal) {
+  const next = Math.min(7, Math.max(1, now + 1));
+  const name = LEVELS[next].name;
+  $("shopTitle").textContent = now === 0 ? "Start with " + name : "Your next step: " + name;
+  $("shopLink").href = "https://www.mandarinzest.com/shop?tags=" + SHOP_TAG[next];
+  $("shopLink").textContent = `Shop ${name} materials ↗`;
+  $("mailTitle").textContent = mode === "how" && last && last.steps.length ? `Stay on track to ${fmtDate(last.date)}` : "Stay on track";
+}
 
-function buildComparison(yourWeeks, hrsPerWeek) {
-  // FSI hours for an English speaker, at same hrs/week
-  const langs = [
-    { name: 'Spanish',   hours: 600 },
-    { name: 'French',    hours: 750 },
-    { name: 'German',    hours: 900 },
-    { name: 'Russian',   hours: 1100 },
-    { name: 'Arabic',    hours: 2200 },
-    { name: 'Chinese',   hours: yourWeeks * hrsPerWeek, isYou: true },
-  ];
+// Phone: show a small result bar while the result card is off screen
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver(es => es.forEach(e => $("peek").classList.toggle("away", e.isIntersecting)), { threshold: 0.15 }).observe($("result"));
+}
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(update, 200); });
+$("peek").onclick = () => $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+$("roadBtn").onclick = () => $("road").scrollIntoView({ behavior: "smooth", block: "start" });
 
-  const max = Math.max(...langs.map(l => l.hours));
-  const el = document.getElementById('compRows');
-  el.innerHTML = '';
-
-  langs.forEach(l => {
-    const weeks = l.hours / hrsPerWeek;
-    const months = weeksToMonths(weeks);
-    const pct = Math.round((l.hours / max) * 100);
-    el.innerHTML += `
-      <div class="comp-row">
-        <div class="comp-lang">${l.isYou ? '🇨🇳 <strong>Your goal</strong>' : l.name}</div>
-        <div class="comp-track"><div class="comp-fill${l.isYou ? ' you' : ''}" style="width:${pct}%"></div></div>
-        <div class="comp-time">${formatTime(months).full}</div>
-      </div>`;
+// ── Share card (1080 × 1350) ──────────────────────────────────
+const mascotImg = new Image(); mascotImg.src = "mascot-laptop.png";
+function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+async function drawCard() {
+  try { await Promise.all([document.fonts.load("800 100px Outfit"), document.fonts.load("600 30px Outfit")]); } catch (e) {}
+  if (!mascotImg.complete) await new Promise(r => { mascotImg.onload = mascotImg.onerror = r; });
+  const c = $("card"), x = c.getContext("2d"), L = last;
+  x.fillStyle = "#fdf1ea"; x.fillRect(0, 0, 1080, 1350);
+  x.fillStyle = "#f8dacd"; x.beginPath(); x.arc(980, 120, 300, 0, Math.PI * 2); x.fill();
+  x.fillStyle = "#e0f4e0"; x.beginPath(); x.arc(60, 1330, 220, 0, Math.PI * 2); x.fill();
+  x.fillStyle = "#a8431a"; x.font = "800 34px Outfit"; x.fillText(L.mode === "by" ? "MY CHINESE PLAN" : "MY CHINESE TIMELINE", 80, 150);
+  x.fillStyle = "#2a2420"; x.font = "700 28px Outfit"; x.textAlign = "right"; x.fillText("Mandarin Zest", 1000, 90); x.textAlign = "left";
+  x.fillStyle = "#2a2420"; x.font = `800 ${L.goalLabel.length > 8 ? 120 : 170}px Outfit`; x.fillText(L.goalLabel.replace(" speaking", ""), 70, 330);
+  if (L.f.speak) { x.fillStyle = "#1b6f1b"; x.font = "800 40px Outfit"; x.fillText("speaking level", 80, 390); }
+  x.fillStyle = "#c4521f"; x.font = "800 72px Outfit";
+  const big = L.mode === "by" ? `${L.hrs} h a week` : (L.steps.length ? "by " + fmtDate(L.date) : "done! 🎉");
+  x.fillText(big, 76, L.f.speak ? 480 : 440);
+  x.fillStyle = "#5c4f47"; x.font = "600 34px Outfit";
+  const sub = L.mode === "by" ? `to get there by ${fmtDate(new Date(+L.when.slice(0,4), +L.when.slice(5) - 1, 15))}` : `at ${L.hrs} hours a week`;
+  x.fillText(sub, 80, L.f.speak ? 535 : 495);
+  // milestones
+  let y = L.f.speak ? 640 : 600;
+  const hrs = L.mode === "by" ? Math.max(1, L.hrs) : L.hrs;
+  L.steps.slice(-4).forEach(l => {
+    const w = hoursTo(l, L.f, L.banked) / L.f.cons / hrs;
+    x.fillStyle = l === L.goal ? "#f37a48" : "#ffffff"; x.beginPath(); x.arc(104, y - 12, 26, 0, Math.PI * 2); x.fill();
+    x.fillStyle = "#2a2420"; x.font = "800 24px Outfit"; x.textAlign = "center"; x.fillText(l === 7 ? "7+" : l, 104, y - 3); x.textAlign = "left";
+    x.font = "700 34px Outfit"; x.fillText(LEVELS[l].name, 150, y);
+    x.fillStyle = "#a8431a"; x.font = "600 32px Outfit"; x.fillText(fmtDate(addWeeks(w)), 330, y);
+    y += 76;
   });
+  if (mascotImg.naturalWidth) { const h = 430, w = h * mascotImg.naturalWidth / mascotImg.naturalHeight; x.drawImage(mascotImg, 1080 - w - 60, 1350 - h - 230, w, h); }
+  x.fillStyle = "#2a2420"; rr(x, 60, 1150, 960, 140, 36); x.fill();
+  x.fillStyle = "#fff"; x.font = "800 40px Outfit"; x.fillText("How long would it take you?", 100, 1210);
+  x.fillStyle = "#f8a77f"; x.font = "600 34px Outfit"; x.fillText(PAGE, 100, 1260);
 }
+$("shareBtn").onclick = async () => {
+  const L = last, note = $("shareNote"); note.textContent = "";
+  const text = L.mode === "by"
+    ? `My plan: ${L.goalLabel} in Chinese with ${L.hrs} hours a week. How long would it take you? https://www.${PAGE}`
+    : `I'll reach ${L.goalLabel} in Chinese around ${L.steps.length ? fmtDate(L.date) : "now"}! How long would it take you? https://www.${PAGE}`;
+  await drawCard();
+  const blob = await new Promise(r => $("card").toBlob(r, "image/png"));
+  try {
+    const file = new File([blob], "my-chinese-timeline.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; }
+  } catch (e) { if (e && e.name === "AbortError") return; }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "my-chinese-timeline.png";
+  document.body.appendChild(a); a.click(); a.remove();
+  try { await navigator.clipboard.writeText(text); note.textContent = "Image saved and text copied. Post it on your story ✨"; }
+  catch (e) { note.textContent = "Image saved. Post it on your story ✨"; }
+};
 
-function buildTips(hrs, method, consistency, motherFactor, extraBoost, currentBanked, goalTotal) {
-  const tips = [];
+// ── Email ─────────────────────────────────────────────────────
+$("mailForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = $("mailInput").value.trim(), m = $("mailMsg");
+  m.className = "mailmsg";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { m.textContent = "Please check your email address."; return; }
+  if (!$("mailOk").checked) { m.textContent = "Please tick the box so we can email you."; return; }
+  const L = last, detail = L.mode === "by" ? `${L.goalLabel} by ${L.when} (${L.hrs} h/wk)` : `${L.goalLabel} ${L.steps.length ? "by " + fmtDate(L.date) : ""} (${L.hrs} h/wk)`;
+  try {
+    fetch(SHEET_URL, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ email, source: "calculator | " + detail.trim(), timestamp: new Date().toISOString() }) }).catch(() => {});
+  } catch (err) {}
+  m.className = "mailmsg ok"; m.textContent = "You're in! Your first email is on its way.";
+  $("mailForm").querySelector("button").disabled = true;
+});
 
-  // ── Consistency & hours ──────────────────────────────────────
-  if (hrs < 5) tips.push('Even adding 30 minutes a day would cut your timeline significantly — consistency beats intensity every time.');
-  if (hrs >= 15) tips.push('With this many study hours, vary your methods: mix character drills, listening, speaking, and reading to avoid burnout and reinforce each skill.');
-  if (consistency === '0.7') tips.push('Set a non-negotiable daily minimum — even 10 minutes on bad days. Streaks matter far more than session length.');
-
-  // ── Method ───────────────────────────────────────────────────
-  if (method.includes('app') || method.includes('self')) {
-    tips.push('Self-study works best with a clear, structured syllabus. Mandarin Zest textbooks are designed exactly for self-learners — each unit builds on the last so you never hit a wall wondering what to study next.');
-  }
-
-  // ── Background ───────────────────────────────────────────────
-  if (motherFactor >= 1.0 && extraBoost < 0.05) {
-    tips.push('Characters are the biggest hurdle for learners without an Asian language background. Mandarin Zest\'s Character Guides break down stroke order, radicals, and memory techniques level by level — tackling characters systematically from day one pays dividends throughout your entire journey.');
-  }
-  if (extraBoost >= 0.1) {
-    tips.push('Leverage your existing character knowledge and start intensive reading practice early. Mandarin Zest Graded Readers are calibrated by HSK level so you can read native-style content from the very beginning without hitting a comprehension wall.');
-  }
-
-  // ── Beginner / HSK 1–2 ──────────────────────────────────────
-  if (currentBanked <= 300 && goalTotal >= 200) {
-    tips.push('At beginner level, having a structured textbook is essential — jumping between apps gives you vocabulary without grammar glue. Mandarin Zest\'s beginner textbooks guide you through pronunciation, tones, and core sentence patterns in a logical sequence.');
-    tips.push('Pair your textbook with a Mandarin Zest Workbook from day one — active writing practice cements what you read far better than passive review alone.');
-  }
-
-  // ── Intermediate / HSK 3–4 ──────────────────────────────────
-  if (currentBanked >= 300 && currentBanked <= 1000 && goalTotal >= 800) {
-    tips.push('Intermediate learners plateau because they stop getting comprehensible input. Mandarin Zest Graded Readers at HSK 3–4 level give you engaging native-style stories — enough challenge to grow, easy enough to actually enjoy reading.');
-    tips.push('At this stage, a structured workbook is the difference between passive recognition and active production. Mandarin Zest Workbooks at intermediate level focus heavily on grammar patterns and writing, exactly the skills that stall most learners here.');
-  }
-
-  // ── Advanced / HSK 5–6 ──────────────────────────────────────
-  if (currentBanked >= 1000 && goalTotal >= 1900) {
-    tips.push('Advanced learners often neglect formal character study, assuming they "know enough." Mandarin Zest\'s Character Guides at HSK 5–6 level cover complex characters, rare radicals, and classical components — the gap between fluent and truly literate.');
-    tips.push('At advanced level, extensive reading is the single most effective tool for closing the gap to native-level fluency. Mandarin Zest Graded Readers at HSK 5–6 expose you to the literary vocabulary and idiomatic structures that conversation practice alone will never cover.');
-  }
-
-  // ── Universal ────────────────────────────────────────────────
-  tips.push('Speaking from day one, even badly, accelerates every other skill. Find a language exchange partner or tutor — real conversations expose gaps that solo study never will.');
-  tips.push('Use spaced repetition (Anki, Pleco) for vocabulary — it is the single highest-ROI daily habit for Chinese learners at any level.');
-
-  const el = document.getElementById('tipList');
-  el.innerHTML = tips.slice(0, 6).map(t => `<li><div class="tip-bullet"></div>${t}</li>`).join('');
-}
-
-function shareResult() {
-  const d = window._shareData;
-  if (!d) return;
-  const text = `I'd need ${formatTime(d.rMonths).full} to reach ${d.goalLabel} in Chinese at ${d.hrsPerWeek} hrs/week — find out your timeline at MandarinZest.com 🇨🇳`;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('.share-btn');
-      btn.textContent = 'Copied! ✓';
-      setTimeout(() => btn.textContent = 'Share result', 2000);
-    });
-  }
-}
-
-function restart() {
-  document.getElementById('resultScreen').style.display = 'none';
-  document.getElementById('formScreen').style.display = 'block';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+update();
 </script>
 </body>
 </html>
